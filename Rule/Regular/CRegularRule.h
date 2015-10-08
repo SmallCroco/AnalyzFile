@@ -24,6 +24,8 @@ public:
 
 	int InitRules(const char* filePath, int encode);
 
+	C_BaseRule* CreateObj(void);
+
 private:
 	vector<C_PatternUnit_UTF8*> m_utf8Patterns;
 	vector<C_PatternUnit_UTF16*> m_utf16Patterns;

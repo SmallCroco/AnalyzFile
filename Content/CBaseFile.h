@@ -26,7 +26,7 @@ public:
 	unsigned long GetFileTxtLen();
 	EM_FileEncode GetEncode();
 
-	void Match(const C_BaseRule* pRule, C_Result* pResult);
+	bool Match(const C_BaseRule* pRule, C_Result* pResult);
 
 private:
 	bool GetFileEncode();

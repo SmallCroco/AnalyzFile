@@ -19,10 +19,15 @@ public:
 	bool SetRule(const C_BaseRule* pRule);
 	const C_BaseRule* GetRule();
 
-	void Analyze();
+	void SetFileType(EM_FileType emFileType);
+	const EM_FileType GetFileType();
+
+	const C_Result* GetResult();
+
+	bool Analyze();
 
 private:
-	void GetFileType();
+	bool GetType();
 
 private:
 	unsigned char*	m_pszFileData;

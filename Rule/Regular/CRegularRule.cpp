@@ -14,10 +14,56 @@ using namespace std;
 
 C_RegularRule::C_RegularRule() {
 
+	this->m_gb18030Patterns.clear();
+	this->m_utf8Patterns.clear();
+	this->m_utf16Patterns.clear();
+	this->m_utf16lePatterns.clear();
+	this->m_utf16bePatterns.clear();
+	this->m_utf32Patterns.clear();
+	this->m_utf32lePatterns.clear();
+	this->m_utf32bePatterns.clear();
 }
 
 C_RegularRule::~C_RegularRule() {
+	for (vector<C_PatternUnit_UTF8*>::iterator li = m_utf8Patterns.begin();
+			li != m_utf8Patterns.end(); ++li) {
+		delete *li;
+	}
 
+	for (vector<C_PatternUnit_UTF16*>::iterator li = m_utf16Patterns.begin();
+			li != m_utf16Patterns.end(); ++li) {
+		delete *li;
+	}
+
+	for (vector<C_PatternUnit_UTF16*>::iterator li = m_utf16lePatterns.begin();
+			li != m_utf16lePatterns.end(); ++li) {
+		delete *li;
+	}
+
+	for (vector<C_PatternUnit_UTF16*>::iterator li = m_utf16bePatterns.begin();
+			li != m_utf16bePatterns.end(); ++li) {
+		delete *li;
+	}
+
+	for (vector<C_PatternUnit_UTF32*>::iterator li = m_utf32Patterns.begin();
+			li != m_utf32Patterns.end(); ++li) {
+		delete *li;
+	}
+
+	for (vector<C_PatternUnit_UTF32*>::iterator li = m_utf32lePatterns.begin();
+			li != m_utf32lePatterns.end(); ++li) {
+		delete *li;
+	}
+
+	for (vector<C_PatternUnit_UTF32*>::iterator li = m_utf32bePatterns.begin();
+			li != m_utf32bePatterns.end(); ++li) {
+		delete *li;
+	}
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li = m_gb18030Patterns.begin();
+			li != m_gb18030Patterns.end(); ++li) {
+		delete *li;
+	}
 }
 
 int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
@@ -27,35 +73,35 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 	char *dealNow, *strEnd, *ptemp;
 	char str_line[MAX_PATTERNS_FILE_LINE_LENG];
 	if ((m_utf8Patterns.size() != 0) && (encode & en_utf_8) != 0) {
-		cout << "UTF-8��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-8正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_utf16Patterns.size() != 0) && (encode & en_utf_16) != 0) {
-		cout << "UTF-16��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-16正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_utf16lePatterns.size() != 0) && (encode & en_utf_16le) != 0) {
-		cout << "UTF-16LE��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-16LE小端正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_utf16bePatterns.size() != 0) && (encode & en_utf_16be) != 0) {
-		cout << "UTF-16BE��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-16BE大端正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_utf32Patterns.size() != 0) && (encode & en_utf_32) != 0) {
-		cout << "UTF-32��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-32正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_utf32lePatterns.size() != 0) && (encode & en_utf_32le) != 0) {
-		cout << "UTF-32LE��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-32LE小端正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_utf32bePatterns.size() != 0) && (encode & en_utf_32be) != 0) {
-		cout << "UTF-32BE��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "UTF-32BE大端正则表达式已经初始化" << endl;
 		return -2;
 	}
 	if ((m_gb18030Patterns.size() != 0) && (encode & en_gb18030) != 0) {
-		cout << "GB18030��������ʽ�Ѿ���ʼ��" << endl;
+		cout << "GB18030正则表达式已经初始化" << endl;
 		return -2;
 	}
 
@@ -375,5 +421,12 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 	}
 
 	return 0;
+}
+
+C_BaseRule* C_RegularRule::CreateObject(void) {
+
+	C_BaseRule* rule = new C_RegularRule();
+
+	return rule;
 }
 

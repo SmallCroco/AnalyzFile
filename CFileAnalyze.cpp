@@ -10,6 +10,15 @@
 #include <iostream>
 #include <stdio.h>
 
+using namespace std;
+
+/*
+ * @Function Name 	: C_FileAnalyze
+ * @Parameter [in]   const char*: pszFilePath --- 文件路径
+ * @Description		: 通过文件路径构造对象
+ * @Return Value	:
+ * @Example			:
+ */
 C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
 
 	m_pszFileData = NULL;
@@ -57,7 +66,15 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
 	}
 }
 
-C_FileAnalyze::C_FileAnalyze(const char* pszFileContent, unsigned long int ulFileLen) {
+/*
+ *	@Function Name	: C_FileAnalyze
+ *	@Parameter [in]	  const char*: pszFileContent --- 文件内容
+ *	@Parameter [in]   unsigned long: ulFileLen --- 文件内容长度
+ *	@Description		: 通过文件内容构造对象
+ *	@Return Value	:
+ *	@Example			:
+ */
+C_FileAnalyze::C_FileAnalyze(const char* pszFileContent, unsigned long ulFileLen) {
 
 	m_pszFileData = NULL;
 	m_ulFileLen = 0;
@@ -75,13 +92,48 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFileContent, unsigned long int ulFil
 	memcpy(m_pszFileData, pszFileContent, m_ulFileLen);
 }
 
+/*
+ * @Function Name	: ~C_FileAnalyze
+ * @Description		: 析构函数
+ * @Return Value	:
+ * @Example			:
+ */
 C_FileAnalyze::~C_FileAnalyze() {
 
+	if (NULL != m_pszFileData) {
+		delete m_pszFileData;
+		m_pszFileData = NULL;
+	}
+
+	if (NULL != m_pRule) {
+		delete m_pRule;
+		m_pRule = NULL;
+	}
+
+	if (NULL != m_pFile) {
+		delete m_pFile;
+		m_pFile = NULL;
+	}
+
+	if (NULL != m_pResult) {
+		delete m_pResult;
+		m_pResult = NULL;
+	}
+
+	m_emFileType = en_unknow;
+	m_ulFileLen = 0;
 }
 
+/*
+ * @Function Name	: SetRule
+ * @Parameter [in] const C_BaseRule: pRule -- 匹配规则
+ * @Description		: 设置匹配规则
+ * @Return Value	: 返回操作状态
+ * 	@Example			: bool bl = this->SetRule(pRule);
+ */
 bool C_FileAnalyze::SetRule(const C_BaseRule* pRule) {
 
-	m_pRule = pRule->CreateObject();
+	m_pRule = pRule->CreateObj(void);
 	if (NULL == m_pRule) {
 		return false;
 	} else {
@@ -89,15 +141,85 @@ bool C_FileAnalyze::SetRule(const C_BaseRule* pRule) {
 	}
 }
 
+/*
+ * @Function Name	: GetRule
+ * @Description		: 获取匹配规则
+ * @Return Value	: 返回匹配规则常量，不能在对象外对规则进行修改
+ * @Example			:
+ */
 const C_BaseRule* C_FileAnalyze::GetRule() {
 
-	return (const C_BaseRule*)m_pRule;
+	return m_pRule;
 }
 
-void C_FileAnalyze::Analyze() {
+/*
+ * @Function Name	: GetResult
+ * @Description		: 获取匹配结果对象
+ * @Return Value	: 返回结果对象
+ * @Example			:
+ */
+const C_Result* C_FileAnalyze::GetResult() {
+	return m_pResult;
+}
 
-	m_emFileType = this->GetFileType();
+/*
+ * @Function Name	: SetFileType
+ * @Parameter [in] EM_FileType: emFileType --- 文件类型
+ * @Description		: 设置文件类型
+ * @Return Value	:
+ * @Example			:
+ */
+void C_FileAnalyze::SetFileType(EM_FileType emFileType) {
 
+	this->m_emFileType = emFileType;
+}
+
+/*
+ * @Function Name	: GetFileType
+ * @Description		: 通过对象获取文件类型
+ * @Return Value	: 文件类型
+ * @Example			:
+ */
+const EM_FileType C_FileAnalyze::GetFileType() {
+
+	return this->m_emFileType;
+}
+/*
+ * @Function Name	: GetFileType
+ * @Description		: 根据文件内容分析文件类型
+ * @Return Value	:　返回操作状态
+ * @Example			:
+ */
+bool C_FileAnalyze::GetType() {
+
+
+	return true;
+}
+/*
+ *	@Function Name	: Analyze
+ *	@Description 	: 对文件进行分析匹配
+ *	@Return Value	: 返回操作状态
+ *	@Example			:
+ */
+bool C_FileAnalyze::Analyze() {
+
+	// 如果规则为空，则返回
+	if (NULL == m_pRule) {
+		cout<<"请先初始化匹配规则"<<endl;
+		return false;
+	}
+
+	// 创建结果对象，并初始化结果对象
+	m_pResult = new C_Result();
+	if (m_pResult == NULL) {
+		cout<<"初始化结果对象失败"<<endl;
+		return false;
+	}
+
+	// 如果文件类型对象为未知类型，则获取文件类型
+	if (m_emFileType == en_unknow) {
+		m_emFileType = this->GetFileType();
+	}
 	switch (m_emFileType) {
 	case en_txt: m_pFile = new C_TxtFile(); break;
 	case en_off: m_pFile = new C_OffFile(); break;
@@ -109,7 +231,12 @@ void C_FileAnalyze::Analyze() {
 	case en_7zip: m_pFile = new C_7zipFile(); break;
 	default: m_pFile = NULL;
 	}
+	if (NULL == m_pFile) {
+		cout<<"文件类型识别失败"<<endl;
+		return false;
+	}
 
-	m_pFile->Match(m_pRule, m_pResult);
+
+	return m_pFile->Match(m_pRule, m_pResult);
 }
 

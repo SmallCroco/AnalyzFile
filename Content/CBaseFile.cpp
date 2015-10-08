@@ -141,15 +141,16 @@ bool C_BaseFile::GetFileEncode() {
 	}
 }
 
-void C_BaseFile::Match(const C_BaseRule* pRule, C_Result* pResult) {
+bool C_BaseFile::Match(const C_BaseRule* pRule, C_Result* pResult) {
 
 	if (NULL == pRule) {
-		return ;
+		return false;
 	}
 
 	if (NULL == pResult) {
-		return;
+		return false;
 	}
 
 
+	return true;
 }
