@@ -25,7 +25,6 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
 	m_ulFileLen = 0;
 	m_emFileType = en_unknow;
 	m_pFile = NULL;
-	m_pRule = NULL;
 	m_pResult = NULL;
 
 	if (NULL != pszFilePath) {
@@ -45,7 +44,8 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
 			rewind(fp);
 		}
 
-		m_pszFileData = (unsigned char*)malloc(sizeof(unsigned char) * m_ulFileLen);
+		m_pszFileData = (unsigned char*) malloc(
+				sizeof(unsigned char) * m_ulFileLen);
 		if (NULL == m_pszFileData) {
 
 			m_ulFileLen = 0;
@@ -53,7 +53,9 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
 			fclose(fp);
 			break;
 		}
-		if (m_ulFileLen != (unsigned long)fread(m_pszFileData, sizeof(unsigned char), m_ulFileLen, fp)) {
+		if (m_ulFileLen
+				!= (unsigned long) fread(m_pszFileData, sizeof(unsigned char),
+						m_ulFileLen, fp)) {
 
 			m_ulFileLen = 0;
 			free(m_pszFileData);
@@ -74,13 +76,13 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
  *	@Return Value	:
  *	@Example			:
  */
-C_FileAnalyze::C_FileAnalyze(const char* pszFileContent, unsigned long ulFileLen) {
+C_FileAnalyze::C_FileAnalyze(const char* pszFileContent,
+		unsigned long ulFileLen) {
 
 	m_pszFileData = NULL;
 	m_ulFileLen = 0;
 	m_emFileType = en_unknow;
 	m_pFile = NULL;
-	m_pRule = NULL;
 	m_pResult = NULL;
 
 	m_ulFileLen = ulFileLen;
@@ -105,11 +107,6 @@ C_FileAnalyze::~C_FileAnalyze() {
 		m_pszFileData = NULL;
 	}
 
-	if (NULL != m_pRule) {
-		delete m_pRule;
-		m_pRule = NULL;
-	}
-
 	if (NULL != m_pFile) {
 		delete m_pFile;
 		m_pFile = NULL;
@@ -122,34 +119,6 @@ C_FileAnalyze::~C_FileAnalyze() {
 
 	m_emFileType = en_unknow;
 	m_ulFileLen = 0;
-}
-
-/*
- * @Function Name	: SetRule
- * @Parameter [in] const C_BaseRule: pRule -- 匹配规则
- * @Description		: 设置匹配规则
- * @Return Value	: 返回操作状态
- * 	@Example			: bool bl = this->SetRule(pRule);
- */
-bool C_FileAnalyze::SetRule(const C_BaseRule* pRule) {
-
-	m_pRule = pRule->CreateObj(void);
-	if (NULL == m_pRule) {
-		return false;
-	} else {
-		return true;
-	}
-}
-
-/*
- * @Function Name	: GetRule
- * @Description		: 获取匹配规则
- * @Return Value	: 返回匹配规则常量，不能在对象外对规则进行修改
- * @Example			:
- */
-const C_BaseRule* C_FileAnalyze::GetRule() {
-
-	return m_pRule;
 }
 
 /*
@@ -192,8 +161,123 @@ const EM_FileType C_FileAnalyze::GetFileType() {
  */
 bool C_FileAnalyze::GetType() {
 
+	// Rtf文件
+	if (m_pszFileData[0] == 0x7B && m_pszFileData[1] == 0x5C
+			&& m_pszFileData[2] == 0x72 && m_pszFileData[3] == 0x74
+			&& m_pszFileData[4] == 0x66) {
+		m_emFileType = en_rtf;
+		return true;
+	}
 
-	return true;
+	// Html文件
+	if (m_pszFileData[0] == 0x68 && m_pszFileData[1] == 0x74
+			&& m_pszFileData[2] == 0x6D && m_pszFileData[3] == 0x6C
+			&& m_pszFileData[4] == 0x3E) {
+		m_emFileType = en_html;
+		return true;
+	}
+
+	// xml文件
+	if (m_pszFileData[0] == 0x3C && m_pszFileData[1] == 0x3F
+			&& m_pszFileData[2] == 0x78 && m_pszFileData[3] == 0x6D
+			&& m_pszFileData[4] == 0x6C) {
+		m_emFileType = en_xml;
+		return true;
+	}
+
+	// PDF文件
+	if (m_pszFileData[0] == 0x25 && m_pszFileData[1] == 0x50
+			&& m_pszFileData[2] == 0x44 && m_pszFileData[3] == 0x46
+			&& m_pszFileData[4] == 0x2D && m_pszFileData[5] == 0x31
+			&& m_pszFileData[6] == 0x2E) {
+		m_emFileType = en_pdf;
+		return true;
+	}
+
+	// Off复合二进制文件
+	if (m_pszFileData[0] == 0xD0 && m_pszFileData[1] == 0xCF
+			&& m_pszFileData[2] == 0x11 && m_pszFileData[3] == 0xE0) {
+		m_emFileType = en_off;
+		return true;
+	}
+
+	// Rar文件
+	if (m_pszFileData[0] == 0x52 && m_pszFileData[1] == 0x61
+			&& m_pszFileData[2] == 0x72 && m_pszFileData[3] == 0x21) {
+		m_emFileType = en_rar;
+		return true;
+	}
+
+	// Zip文件
+	if (m_pszFileData[0] == 0x50 && m_pszFileData[1] == 0x4B
+			&& m_pszFileData[2] == 0x03 && m_pszFileData[3] == 04) {
+		m_emFileType = en_zip;
+		return true;
+	}
+
+	// tar文件
+	if (m_ulFileLen > 512) {
+		tar_header* tarHeader = (tar_header*) m_pszFileData;
+		if ((tarHeader->magic[0] != 'u') || (tarHeader->magic[1] != 's')
+				|| (tarHeader->magic[2] != 't') || (tarHeader->magic[3] != 'a')
+				|| (tarHeader->magic[4] != 'r')
+				|| (tarHeader->magic[5] != ' ')) {
+			// 没有tar标志,进一步判断
+
+			// 取出校验值
+			unsigned long chksum = 0;
+			for (int i = 7; i >= 0; i--) {
+
+				if (tarHeader->chksum[i] >= 0x30) {
+					unsigned int s = tarHeader->chksum[i] - 0x30;
+					int j = 7 - i;
+					while (j > 2) {
+						s *= 8;
+						j--;
+					}
+					chksum += s;
+				}
+
+				tarHeader->chksum[i] = 0x20;
+
+			}
+
+			// 计算校验和
+			unsigned int sum = 0;
+			for (int i = 0; i < 512; i++) {
+				sum += m_pszFileData[i];
+			}
+
+			// 如果相等，则是tar文件
+			if (sum == chksum) {
+
+				m_emFileType = en_tar;
+				return true;
+
+			}
+		} else {
+			// 是tar文件
+
+			m_emFileType = en_tar;
+			return true;
+		}
+	}
+
+	// gz文件
+	if (m_pszFileData[0] == 0x1F && m_pszFileData[1] == 0x8B && m_pszFileData[2] == 0x0B ) {
+		m_emFileType = en_gz;
+		return true;
+	}
+
+	// 7-zip文件
+	if (m_pszFileData[0] == 0x37 && m_pszFileData[1] == 0x7A && m_pszFileData[2] == 0xBC &&
+			m_pszFileData[3] == 0xAF && m_pszFileData[4] == 0x27 && m_pszFileData[5] == 0x1C) {
+		m_emFileType = en_7zip;
+		return true;
+	}
+
+	m_emFileType = en_txt;
+
 }
 /*
  *	@Function Name	: Analyze
@@ -201,18 +285,17 @@ bool C_FileAnalyze::GetType() {
  *	@Return Value	: 返回操作状态
  *	@Example			:
  */
-bool C_FileAnalyze::Analyze() {
+bool C_FileAnalyze::Analyze(const C_BaseRule* pRule) {
 
-	// 如果规则为空，则返回
-	if (NULL == m_pRule) {
-		cout<<"请先初始化匹配规则"<<endl;
+	if (NULL == pRule) {
+		cout << "匹配规则不能为空" << endl;
 		return false;
 	}
 
 	// 创建结果对象，并初始化结果对象
 	m_pResult = new C_Result();
 	if (m_pResult == NULL) {
-		cout<<"初始化结果对象失败"<<endl;
+		cout << "初始化结果对象失败" << endl;
 		return false;
 	}
 
@@ -221,22 +304,47 @@ bool C_FileAnalyze::Analyze() {
 		m_emFileType = this->GetFileType();
 	}
 	switch (m_emFileType) {
-	case en_txt: m_pFile = new C_TxtFile(); break;
-	case en_off: m_pFile = new C_OffFile(); break;
-	case en_rar: m_pFile = new C_RarFile(); break;
-	case en_zip: m_pFile = new C_ZipFile(); break;
-	case en_gz: m_pFile  = new C_GzFile(); break;
-	case en_pdf: m_pFile = new C_PdfFile(); break;
-	case en_tar: m_pFile = new C_TarFile(); break;
-	case en_7zip: m_pFile = new C_7zipFile(); break;
-	default: m_pFile = NULL;
+	case en_txt:
+		m_pFile = new C_TxtFile();
+		break;
+	case en_off:
+		m_pFile = new C_OffFile();
+		break;
+	case en_rar:
+		m_pFile = new C_RarFile();
+		break;
+	case en_zip:
+		m_pFile = new C_ZipFile();
+		break;
+	case en_gz:
+		m_pFile = new C_GzFile();
+		break;
+	case en_pdf:
+		m_pFile = new C_PdfFile();
+		break;
+	case en_tar:
+		m_pFile = new C_TarFile();
+		break;
+	case en_7zip:
+		m_pFile = new C_7zipFile();
+		break;
+	case en_xml:
+		m_pFile = new C_XmlFile();
+		break;
+	case en_rtf:
+		m_pFile = new C_RtfFile();
+		break;
+	case en_html:
+		m_pFile = new C_HtmlFile();
+		break;
+	default:
+		m_pFile = NULL;
 	}
 	if (NULL == m_pFile) {
-		cout<<"文件类型识别失败"<<endl;
+		cout << "文件类型识别失败" << endl;
 		return false;
 	}
 
-
-	return m_pFile->Match(m_pRule, m_pResult);
+	return m_pFile->Match(pRule, m_pResult);
 }
 

@@ -13,9 +13,9 @@ public:
 	C_PatternUnit();
 	virtual ~C_PatternUnit();
 
-	const void* getPcre() = 0;
+	virtual const void* getPcre() = 0;
 
-	const void* getPcreExtra() = 0;
+	virtual const void* getPcreExtra() = 0;
 
 protected:
 	virtual int PcreCompile() = 0;

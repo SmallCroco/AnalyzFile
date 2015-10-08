@@ -15,7 +15,7 @@ public:
 
 	virtual int InitRules(const char* filePath, int encode) = 0;
 
-	virtual C_BaseRule* CreateObj(void) = 0;
+	virtual C_BaseRule* CreateObj() = 0;
 
 protected:
 	bool ChangeTextEncode(EM_FileEncode emSrcEncode, EM_FileEncode emDestEncode,

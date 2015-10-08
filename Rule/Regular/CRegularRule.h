@@ -27,7 +27,7 @@ public:
 	C_BaseRule* CreateObj();
 
 private:
-	vector<C_PatternUnit_UTF8*> m_utf8Patterns;
+	vector<C_PatternUnit_UTF8*> 	m_utf8Patterns;
 	vector<C_PatternUnit_UTF16*> m_utf16Patterns;
 	vector<C_PatternUnit_UTF16*> m_utf16lePatterns;
 	vector<C_PatternUnit_UTF16*> m_utf16bePatterns;

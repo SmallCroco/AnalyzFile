@@ -17,12 +17,13 @@ int main() {
 
 	// 初始化匹配规则
 	C_BaseRule* rule = new C_RegularRule();
+	rule->InitRules("", 0);
 
-	// 设置匹配规则
-	an->SetRule(rule);
-
+	an->Analyze(rule);
 
 	delete an;
+
+	delete rule;
 
 	return 0;
 }

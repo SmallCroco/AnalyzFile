@@ -53,3 +53,21 @@ int C_PatternUnit_UTF16::PcreCompile() {
 
 	return 0;
 }
+
+/*
+ * @Function Name	: getPcre
+ * @Description		: 获取pcre正则表达式指针
+ */
+const void* C_PatternUnit_UTF16::getPcre() {
+
+		return (const void*)m_pPcre;
+}
+
+/*
+ * @Function Name	: getPcreExtra
+ * @Description		: 获取pcreExtra指针
+ */
+const void* C_PatternUnit_UTF16::getPcreExtra() {
+
+		return (const void*)m_pPcreExtra;
+}

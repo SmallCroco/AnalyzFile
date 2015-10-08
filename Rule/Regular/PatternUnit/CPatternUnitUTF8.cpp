@@ -33,21 +33,41 @@ C_PatternUnit_UTF8::~C_PatternUnit_UTF8() {
 int C_PatternUnit_UTF8::PcreCompile() {
 
 	const char* error;
-	int errorffset;
+	int erroffset;
 
-	m_pPcre = pcre_compile((PCRE_SPTR)m_pContent, PCRE_NO_AUTO_CAPTURE |
-				PCRE_UTF8 | PCRE_NO_UTF8_CHECK | PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE,
-				&error, &errorffset, NULL);
+	m_pPcre = pcre_compile((PCRE_SPTR)m_pContent,
+				PCRE_NO_AUTO_CAPTURE | PCRE_UTF8 | PCRE_NO_UTF8_CHECK
+						| PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE, &error,
+				&erroffset,
+				NULL);
 
 	if (NULL == m_pPcre) {
-		cout<<"PCRE UTF8 compilation failed at offset "<<errorffset<<": "<<error<<endl;
+		cout<<"PCRE UTF8 compilation failed at offset "<<erroffset<<": "<<error<<endl;
 		return -1;
 	}
 
-	m_pPcreExtra = pcre_study(m_pPcre, PCRE_STUDY_JIT_COMPILE, #error);
+	m_pPcreExtra = pcre_study(m_pPcre, PCRE_STUDY_JIT_COMPILE, &error);
 	if (NULL == m_pPcreExtra) {
 		cout<<"PCRE UTF8 pcre_study failed: "<<error<<endl;
 	}
 
 	return 0;
+}
+
+/*
+ * @Function Name	: getPcre
+ * @Description		: 获取pcre正则表达式指针
+ */
+const void* C_PatternUnit_UTF8::getPcre() {
+
+		return (const void*)m_pPcre;
+}
+
+/*
+ * @Function Name	: getPcreExtra
+ * @Description		: 获取pcreExtra指针
+ */
+const void* C_PatternUnit_UTF8::getPcreExtra() {
+
+		return (const void*)m_pPcreExtra;
 }

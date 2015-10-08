@@ -16,15 +16,12 @@ public:
 	C_FileAnalyze(const char* pszFileContent, unsigned long ulFileLen);
 	~C_FileAnalyze();
 
-	bool SetRule(const C_BaseRule* pRule);
-	const C_BaseRule* GetRule();
-
 	void SetFileType(EM_FileType emFileType);
 	const EM_FileType GetFileType();
 
 	const C_Result* GetResult();
 
-	bool Analyze();
+	bool Analyze(const C_BaseRule* pRule);
 
 private:
 	bool GetType();
@@ -34,7 +31,6 @@ private:
 	unsigned long	m_ulFileLen;
 	EM_FileType		m_emFileType;
 	C_BaseFile*		m_pFile;
-	C_BaseRule*		m_pRule;
 	C_Result*			m_pResult;
 };
 
