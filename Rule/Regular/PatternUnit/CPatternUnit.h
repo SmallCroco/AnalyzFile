@@ -1,7 +1,7 @@
 /*
  * CPatternUnit.h
  *
- *  Created on: 2015Äê9ÔÂ25ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½25ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -13,22 +13,19 @@ public:
 	C_PatternUnit();
 	virtual ~C_PatternUnit();
 
-	const void* getPcre();
+	const void* getPcre() = 0;
 
-	const void* getPcreExtra();
+	const void* getPcreExtra() = 0;
 
 protected:
 	virtual int PcreCompile() = 0;
 
 
 protected:
-	int			m_nPid;
-	char*		m_pName;
-	char*		m_pContent;
-	int 		m_nContentLen;
-
-	pcre*		m_pPcre;
-	pcre_extra*	m_pPcreExtra;
+	int				m_nPid;
+	char*			m_pName;
+	char*			m_pContent;
+	int 			m_nContentLen;
 };
 
 #endif /* RULE_REGULAR_CPATTERNUNIT_H_ */

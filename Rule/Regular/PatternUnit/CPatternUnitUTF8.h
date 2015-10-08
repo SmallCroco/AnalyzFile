@@ -1,7 +1,7 @@
 /*
  * CPatternUnitUTF8.h
  *
- *  Created on: 2015Äê9ÔÂ28ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½28ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -13,8 +13,15 @@ public:
 	C_PatternUnit_UTF8();
 	~C_PatternUnit_UTF8();
 
+	const void* getPcre();
+	const void* getPcreExtra();
+
 protected:
 	int PcreCompile();
+
+private:
+	pcre*			m_pPcre;
+	pcre_extra*	m_pPcreExtra;
 };
 
 #endif /* RULE_REGULAR_PATTERNUNIT_CPATTERNUNITUTF8_H_ */

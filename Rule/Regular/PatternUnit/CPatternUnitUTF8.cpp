@@ -1,19 +1,33 @@
 /*
  * CPatternUnitUTF8.cpp
  *
- *  Created on: 2015Äê9ÔÂ28ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½28ï¿½ï¿½
  *      Author: SmallCroco
  */
 
 #include "CPatternUnitUTF8.h"
+#include "pcre.h"
+#include <iostream>
+
+using namespace std;
 
 C_PatternUnit_UTF8::C_PatternUnit_UTF8() {
 	// TODO Auto-generated constructor stub
-
+	m_pPcre = NULL;
+	m_pPcreExtra = NULL;
 }
 
 C_PatternUnit_UTF8::~C_PatternUnit_UTF8() {
 	// TODO Auto-generated destructor stub
+	if (NULL != m_pPcre) {
+		pcre_free(m_pPcre);
+		m_pPcre = NULL;
+	}
+
+	if (NULL != m_pPcreExtra) {
+		pcre_free_study(m_pPcreExtra);
+		m_pPcreExtra = NULL;
+	}
 }
 
 int C_PatternUnit_UTF8::PcreCompile() {
@@ -23,10 +37,10 @@ int C_PatternUnit_UTF8::PcreCompile() {
 
 	m_pPcre = pcre_compile((PCRE_SPTR)m_pContent, PCRE_NO_AUTO_CAPTURE |
 				PCRE_UTF8 | PCRE_NO_UTF8_CHECK | PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE,
-				&error, &erroffset, NULL);
+				&error, &errorffset, NULL);
 
 	if (NULL == m_pPcre) {
-		cout<<"PCRE UTF8 compilation failed at offset "<<erroffset<<": "<<error<<endl;
+		cout<<"PCRE UTF8 compilation failed at offset "<<errorffset<<": "<<error<<endl;
 		return -1;
 	}
 

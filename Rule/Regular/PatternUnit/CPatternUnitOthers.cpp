@@ -1,19 +1,33 @@
 /*
  * CPatternUnitOthers.cpp
  *
- *  Created on: 2015Äê9ÔÂ28ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½28ï¿½ï¿½
  *      Author: SmallCroco
  */
 
 #include "CPatternUnitOthers.h"
+#include "pcre.h"
+#include <iostream>
+
+using namespace std;
 
 C_PatternUnit_Others::C_PatternUnit_Others() {
-	// TODO Auto-generated constructor stub
 
+	m_pPcre = NULL;
+	m_pPcreExtra = NULL;
 }
 
 C_PatternUnit_Others::~C_PatternUnit_Others() {
-	// TODO Auto-generated destructor stub
+
+	if (NULL != m_pPcre) {
+		pcre_free(m_pPcre);
+		m_pPcre = NULL;
+	}
+
+	if (NULL != m_pPcreExtra) {
+		pcre_free_study(m_pPcreExtra);
+		m_pPcreExtra = NULL;
+	}
 }
 
 int C_PatternUnit_Others::PcreCompile() {
@@ -21,7 +35,7 @@ int C_PatternUnit_Others::PcreCompile() {
 	const char* error;
 	int erroffset;
 
-	m_pPcre = pcre_compile((PCRE_SPTR)m_pPcontent, PCRE_NO_AUTO_CAPTURE | PCRE_UTF8 |
+	m_pPcre = pcre_compile((PCRE_SPTR)m_pContent, PCRE_NO_AUTO_CAPTURE | PCRE_UTF8 |
 			PCRE_NO_UTF8_CHECK | PCRE_UCP | PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE, &error,
 			&erroffset, NULL);
 

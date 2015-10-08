@@ -12,6 +12,10 @@
 
 using namespace std;
 
+/*
+ * @Function Name	: C_RegularRule
+ * @Description		: 构造函数
+ */
 C_RegularRule::C_RegularRule() {
 
 	this->m_gb18030Patterns.clear();
@@ -24,6 +28,11 @@ C_RegularRule::C_RegularRule() {
 	this->m_utf32bePatterns.clear();
 }
 
+/*
+ * @Function Name	: ~C_RegularRule
+ * @Description		: 析构函数
+ * @Example			:
+ */
 C_RegularRule::~C_RegularRule() {
 	for (vector<C_PatternUnit_UTF8*>::iterator li = m_utf8Patterns.begin();
 			li != m_utf8Patterns.end(); ++li) {
@@ -66,6 +75,16 @@ C_RegularRule::~C_RegularRule() {
 	}
 }
 
+/*
+ * @Function Name	: InitRules
+ * @Parameter [in] const char* : pszFilePath --- 规则文件路径
+ * @Parameter [in] int : encode --- 文件编码
+ * @Description		: 初始化文件匹配规则
+ * @Return Value	:
+ * 		成功返回0
+ * 		失败返回负整数
+ * @Example			:
+ */
 int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 	FILE* fp;
 
@@ -423,7 +442,13 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 	return 0;
 }
 
-C_BaseRule* C_RegularRule::CreateObject(void) {
+/*
+ * @Function Name	: CreateObject
+ * @Description		: 通过该方法构造本类的实例
+ * @Return Value	: 返回本类的对象实例
+ * 	@Example			:
+ */
+C_BaseRule* C_RegularRule::CreateObj() {
 
 	C_BaseRule* rule = new C_RegularRule();
 

@@ -1,19 +1,33 @@
 /*
  * CPatternUnitGB18030.cpp
  *
- *  Created on: 2015��9��28��
+ *  Created on: 2015��9��28��
  *      Author: SmallCroco
  */
 
 #include "CPatternUnitGB18030.h"
+#include "pcre.h"
+#include <iostream>
+
+using namespace std;
 
 C_PatternUnit_GB18030::C_PatternUnit_GB18030() {
-	// TODO Auto-generated constructor stub
 
+	m_pPcre = NULL;
+	m_pPcreExtra = NULL;
 }
 
 C_PatternUnit_GB18030::~C_PatternUnit_GB18030() {
-	// TODO Auto-generated destructor stub
+
+	if (NULL != m_pPcre) {
+		pcre_free(m_pPcre);
+		m_pPcre = NULL;
+	}
+
+	if (NULL != m_pPcreExtra) {
+		pcre_free_study(m_pPcreExtra);
+		m_pPcreExtra = NULL;
+	}
 }
 
 int C_PatternUnit_GB18030::PcreCompile() {
@@ -36,4 +50,22 @@ int C_PatternUnit_GB18030::PcreCompile() {
 	}
 
 	return 0;
+}
+
+/*
+ * @Function Name	: getPcre
+ * @Description		: 获取pcre正则表达式指针
+ */
+const void* C_PatternUnit_GB18030::getPcre() {
+
+		return (const void*)m_pPcre;
+}
+
+/*
+ * @Function Name	: getPcreExtra
+ * @Description		: 获取pcreExtra指针
+ */
+const void* C_PatternUnit_GB18030::getPcreExtra() {
+
+		return (const void*)m_pPcreExtra;
 }

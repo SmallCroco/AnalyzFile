@@ -1,22 +1,28 @@
 /*
  * CPatternUnit.cpp
  *
- *  Created on: 2015Äê9ÔÂ25ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½25ï¿½ï¿½
  *      Author: SmallCroco
  */
 
 #include "CPatternUnit.h"
+#include <stdlib.h>
 
+/*
+ * @Function Name	: C_PatternUnit
+ * @Description		: æ„é€ å‡½æ•°
+ */
 C_PatternUnit::C_PatternUnit() {
 	m_nPid = 0;
 	m_pName = NULL;
 	m_pContent = NULL;
 	m_nContentLen = 0;
-
-	m_pPcre = NULL;
-	m_pPcreExtra = NULL;
 }
 
+/*
+ * @Function Name	: ~C_PatternUnit
+ * @Description		: ææ„å‡½æ•°
+ */
 C_PatternUnit::~C_PatternUnit() {
 	m_nPid = 0;
 	m_nContentLen = 0;
@@ -30,25 +36,5 @@ C_PatternUnit::~C_PatternUnit() {
 		free(m_pContent);
 		m_pContent = NULL;
 	}
-
-	if (NULL != m_pPcre) {
-		pcre_free(m_pPcre);
-		m_pPcre = NULL;
-	}
-
-	if (NULL != m_pPcreExtra) {
-		pcre_free_study(m_pPcreExtra);
-		m_pPcreExtra = NULL;
-	}
-}
-
-const void* C_PatternUnit::getPcre() {
-
-		return (const void*)m_pPcre;
-}
-
-const void* C_PatternUnit::getPcreExtra() {
-
-		return (const void*)m_pPcreExtra;
 }
 

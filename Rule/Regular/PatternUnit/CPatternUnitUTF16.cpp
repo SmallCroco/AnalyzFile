@@ -1,19 +1,33 @@
 /*
  * CPatternUnitUTF16.cpp
  *
- *  Created on: 2015Äê9ÔÂ28ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½28ï¿½ï¿½
  *      Author: SmallCroco
  */
 
 #include "CPatternUnitUTF16.h"
+#include "pcre.h"
+#include <iostream>
+
+using namespace std;
 
 C_PatternUnit_UTF16::C_PatternUnit_UTF16() {
-	// TODO Auto-generated constructor stub
 
+	m_pPcre = NULL;
+	m_pPcreExtra = NULL;
 }
 
 C_PatternUnit_UTF16::~C_PatternUnit_UTF16() {
-	// TODO Auto-generated destructor stub
+
+	if (NULL != m_pPcre) {
+		pcre16_free(m_pPcre);
+		m_pPcre = NULL;
+	}
+
+	if (NULL != m_pPcreExtra) {
+		pcre16_free_study(m_pPcreExtra);
+		m_pPcreExtra = NULL;
+	}
 }
 
 int C_PatternUnit_UTF16::PcreCompile() {
@@ -21,12 +35,14 @@ int C_PatternUnit_UTF16::PcreCompile() {
 	const char* error;
 	int erroffset;
 
-	m_pPcre = pcre16_compile((PCRE_SPTR16)m_pContent, PCRE_NO_AUTO_CAPTURE |
-			 PCRE_NO_UTF16_CHECK | PCRE_MULTILINE | PCRE_NO_START_OPTIME, &error,
-			 &erroffset, NULL);
+	m_pPcre = pcre16_compile((PCRE_SPTR16)m_pContent,
+			PCRE_NO_AUTO_CAPTURE | PCRE_NO_UTF16_CHECK
+					| PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE, &error,
+			&erroffset,
+			NULL);
 
 	if (NULL == m_pPcre) {
-		cout("PCRE UTF16 compilation failed at offset "<<erroffset<<": "<<error<<endl;
+		cout<<"PCRE UTF16 compilation failed at offset "<<erroffset<<": "<<error<<endl;
 		return -1;
 	}
 
