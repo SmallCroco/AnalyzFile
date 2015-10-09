@@ -30,6 +30,9 @@
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Result"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Result/OtherHeader"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/XmlFile"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/RtfFile"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/HtmlFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/ZipFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/TxtFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/TarFile"/>
@@ -47,6 +50,14 @@
 							</tool>
 							<tool id="org.eclipse.cdt.msvc.link.exe.debug.3376320" name="Linker (link)" superClass="org.eclipse.cdt.msvc.link.exe.debug">
 								<option id="org.eclipse.cdt.msvc.link.option.debug.1860528777" name="Generate Debug Info (/debug)" superClass="org.eclipse.cdt.msvc.link.option.debug" value="true" valueType="boolean"/>
+								<option id="org.eclipse.cdt.msvc.link.option.libraries.585577857" name="Libraries" superClass="org.eclipse.cdt.msvc.link.option.libraries" valueType="libs">
+									<listOptionValue builtIn="false" value="doctotext"/>
+									<listOptionValue builtIn="false" value="unrar"/>
+									<listOptionValue builtIn="false" value="pcre"/>
+								</option>
+								<option id="org.eclipse.cdt.msvc.link.option.libpath.155502781" name="Additional Libpath (/libpath)" superClass="org.eclipse.cdt.msvc.link.option.libpath" valueType="stringList">
+									<listOptionValue builtIn="false" value="/usr/lib"/>
+								</option>
 								<inputType id="org.eclipse.cdt.msvc.link.inputType.514075434" superClass="org.eclipse.cdt.msvc.link.inputType"/>
 							</tool>
 							<tool id="org.eclipse.cdt.msvc.lib.1444632341" name="Library Manager (lib)" superClass="org.eclipse.cdt.msvc.lib"/>

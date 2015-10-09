@@ -1,14 +1,14 @@
 /*
  * CGzFile.cpp
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
 #include "CGzFile.h"
 
-C_GzFile::C_GzFile() {
-	// TODO Auto-generated constructor stub
+C_GzFile::C_GzFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
+	C_BaseFile(pszFileData, ulFileLen, emEncode){
 
 }
 

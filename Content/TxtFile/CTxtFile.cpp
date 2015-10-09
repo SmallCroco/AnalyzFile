@@ -1,18 +1,27 @@
 /*
  * CTxtFile.cpp
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
 #include "CTxtFile.h"
 
-C_TxtFile::C_TxtFile() {
-	// TODO Auto-generated constructor stub
+C_TxtFile::C_TxtFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
+	C_BaseFile(pszFileData, ulFileLen, emEncode){
 
 }
 
 C_TxtFile::~C_TxtFile() {
-	// TODO Auto-generated destructor stub
+
 }
 
+
+bool C_TxtFile::ExtractTxt() {
+
+	m_strText.append(m_pszFileData, m_ulFileLen);
+
+	m_ulTextLen = m_ulFileLen;
+
+	return true;
+}

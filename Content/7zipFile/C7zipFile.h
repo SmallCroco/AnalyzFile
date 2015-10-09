@@ -1,7 +1,7 @@
 /*
  * C7zipFile.h
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -10,8 +10,8 @@
 
 class C_7zipFile: public C_BaseFile {
 public:
-	C_7zipFile();
-	virtual ~C_7zipFile();
+	C_7zipFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_7zipFile();
 };
 
 #endif /* CONTENT_7ZIPFILE_C7ZIPFILE_H_ */

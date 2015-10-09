@@ -1,7 +1,7 @@
 /*
  * CTarFile.h
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -10,8 +10,8 @@
 
 class C_TarFile: public C_BaseFile {
 public:
-	C_TarFile();
-	virtual ~C_TarFile();
+	C_TarFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_TarFile();
 };
 
 #endif /* CONTENT_TARFILE_CTARFILE_H_ */

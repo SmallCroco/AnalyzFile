@@ -8,16 +8,41 @@
 #include "CBaseFile.h"
 
 C_BaseFile::C_BaseFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow) {
-	m_pszFileData = NULL;
-	m_ulFileLen = 0;
+
+	if (NULL != pszFileData) {
+		m_pszFileData = new char[ulFileLen];
+		if (NULL != m_pszFileData) {
+			memset(m_pszFileData, 0, ulFileLen*sizeof(char));
+			memcpy(m_pszFileData, pszFileData, ulFileLen*sizeof(char));
+			m_ulFileLen = ulFileLen;
+		} else {
+			m_pszFileData = NULL;
+			m_ulFileLen = 0;
+		}
+	} else {
+		m_pszFileData = NULL;
+		m_ulFileLen = 0;
+	}
+
 	m_strText = "";
 	m_ulTextLen = 0;
-	m_emEncode = en_unknow;
+	m_emEncode = emEncode;
 }
 
 C_BaseFile::~C_BaseFile() {
+	if (NULL != m_pszFileData) {
+		delete m_pszFileData;
+		m_pszFileData = NULL;
+	}
+
+	m_ulFileLen = 0;
+	m_strText = "";
+	m_ulTextLen = 0;
+
+	m_emEncode = en_unknow;
 
 }
+
 
 const char* C_BaseFile::GetFileData() {
 

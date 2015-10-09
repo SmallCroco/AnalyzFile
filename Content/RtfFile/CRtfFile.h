@@ -10,8 +10,8 @@
 
 class C_RtfFile: public C_BaseFile {
 public:
-	C_RtfFile();
-	virtual ~C_RtfFile();
+	C_RtfFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_RtfFile();
 };
 
 #endif /* CONTENT_RTFFILE_CRTFFILE_H_ */

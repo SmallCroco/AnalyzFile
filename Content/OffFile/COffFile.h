@@ -1,7 +1,7 @@
 /*
  * COffFile.h
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -10,8 +10,8 @@
 
 class C_OffFile: public C_BaseFile {
 public:
-	C_OffFile();
-	virtual ~C_OffFile();
+	C_OffFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_OffFile();
 };
 
 #endif /* CONTENT_OFFFILE_COFFFILE_H_ */

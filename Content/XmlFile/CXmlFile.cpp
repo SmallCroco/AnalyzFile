@@ -6,13 +6,28 @@
  */
 
 #include "CXmlFile.h"
+#include "uchardet.h"
+#include "metadata.h"
+#include "plain_text_extractor.h"
 
-C_XmlFile::C_XmlFile() {
-	// TODO Auto-generated constructor stub
+C_XmlFile::C_XmlFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
+	C_BaseFile(pszFileData, ulFileLen, emEncode){
 
 }
 
 C_XmlFile::~C_XmlFile() {
-	// TODO Auto-generated destructor stub
+
+}
+
+bool C_XmlFile::ExtractTxt() {
+
+	PlainTextExtractor extractor;
+	extractor.setVerboseLogging(true);
+
+	if (!extractor.processFile(m_pFileData, m_lFileLength, m_strText)) {
+		return false;
+	}
+
+	return true;
 }
 

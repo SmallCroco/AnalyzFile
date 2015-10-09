@@ -1,7 +1,7 @@
 /*
  * CRarFile.h
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -10,8 +10,8 @@
 
 class C_RarFile: public C_BaseFile {
 public:
-	C_RarFile();
-	virtual ~C_RarFile();
+	C_RarFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_RarFile();
 };
 
 #endif /* CONTENT_RARFILE_CRARFILE_H_ */

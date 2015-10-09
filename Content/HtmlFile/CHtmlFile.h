@@ -10,8 +10,8 @@
 
 class C_HtmlFile: public C_BaseFile {
 public:
-	C_HtmlFile();
-	virtual ~C_HtmlFile();
+	C_HtmlFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_HtmlFile();
 };
 
 #endif /* CONTENT_HTMLFILE_CHTMLFILE_H_ */

@@ -1,7 +1,7 @@
 /*
  * CGzFile.h
  *
- *  Created on: 2015Äê9ÔÂ24ÈÕ
+ *  Created on: 2015ï¿½ï¿½9ï¿½ï¿½24ï¿½ï¿½
  *      Author: SmallCroco
  */
 
@@ -10,8 +10,8 @@
 
 class C_GzFile: public C_BaseFile {
 public:
-	C_GzFile();
-	virtual ~C_GzFile();
+	C_GzFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	~C_GzFile();
 };
 
 #endif /* CONTENT_GZFILE_CGZFILE_H_ */

@@ -12,8 +12,7 @@
 #include "CBaseRule.h"
 #include "CResult.h"
 
-using namespace std;
-
+using std::string;
 
 class C_BaseFile {
 public:
@@ -22,8 +21,10 @@ public:
 
 	const char* GetFileData();
 	unsigned long GetFileLen();
-	string GetFileTxt();
+
+	std::string GetFileTxt();
 	unsigned long GetFileTxtLen();
+
 	EM_FileEncode GetEncode();
 
 	bool Match(const C_BaseRule* pRule, C_Result* pResult);
@@ -31,11 +32,13 @@ public:
 private:
 	bool GetFileEncode();
 
+	virtual bool ExtractTxt() = 0;
+
 
 protected:
-	char*			m_pszFileData;
+	char*				m_pszFileData;
 	unsigned long 	m_ulFileLen;
-	string			m_strText;
+	std::string		m_strText;
 	unsigned long	m_ulTextLen;
 	EM_FileEncode	m_emEncode;
 };
