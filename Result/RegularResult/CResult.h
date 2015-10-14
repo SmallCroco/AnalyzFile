@@ -9,6 +9,7 @@
 #define RESULT_CRESULT_H_
 
 #include <vector>
+#include "CBaseResult.h"
 
 using std::vector;
 
@@ -31,10 +32,10 @@ struct SMatchUnitNum {
 };
 
 
-class C_Result {
+class C_RegularResult: public C_BaseResult {
 public:
-	C_Result();
-	~C_Result();
+	C_RegularResult();
+	~C_RegularResult();
 
 public:
 	int m_unitNum;

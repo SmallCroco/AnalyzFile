@@ -19,17 +19,20 @@ using namespace std;
  * @Return Value	:
  * @Example			:
  */
-C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
+C_FileAnalyze::C_FileAnalyze(const char* pszFilePath, EM_FileType emFileType):m_pszFilePath(pszFilePath) {
 
 	m_pszFileData = NULL;
 	m_ulFileLen = 0;
-	m_emFileType = en_unknow;
+	m_emFileType = emFileType;
+
 	m_pFile = NULL;
+	m_pRule = NULL;
 	m_pResult = NULL;
 
-	if (NULL != pszFilePath) {
+	// 读取文件内容
+	if (NULL != m_pszFilePath) {
 
-		FILE* fp = fopen(pszFilePath, "rb");
+		FILE* fp = fopen(m_pszFilePath, "rb");
 		if (NULL == fp) {
 			break;
 		}
@@ -77,21 +80,24 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath) {
  *	@Example			:
  */
 C_FileAnalyze::C_FileAnalyze(const char* pszFileContent,
-		unsigned long ulFileLen) {
+		unsigned long ulFileLen, EM_FileType emFileType):m_pszFilePath(NULL) {
 
 	m_pszFileData = NULL;
 	m_ulFileLen = 0;
-	m_emFileType = en_unknow;
+	m_emFileType = emFileType;
+
 	m_pFile = NULL;
+	m_pRule = NULL;
 	m_pResult = NULL;
 
+	// 复制文件内容
 	m_ulFileLen = ulFileLen;
 	m_pszFileData = new unsigned char[m_ulFileLen];
 	if (NULL == m_pszFileData) {
 		m_ulFileLen = 0;
+	} else {
+		memcpy(m_pszFileData, pszFileContent, m_ulFileLen);
 	}
-
-	memcpy(m_pszFileData, pszFileContent, m_ulFileLen);
 }
 
 /*
@@ -102,19 +108,22 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFileContent,
  */
 C_FileAnalyze::~C_FileAnalyze() {
 
+	//　释放文件内容
 	if (NULL != m_pszFileData) {
 		delete m_pszFileData;
 		m_pszFileData = NULL;
 	}
 
+	// 释放文件对象
 	if (NULL != m_pFile) {
 		delete m_pFile;
 		m_pFile = NULL;
 	}
 
-	if (NULL != m_pResult) {
-		delete m_pResult;
-		m_pResult = NULL;
+	// 释放匹配规则
+	if (NULL != m_pRule) {
+		delete m_pRule;
+		m_pRule = NULL;
 	}
 
 	m_emFileType = en_unknow;
@@ -127,20 +136,31 @@ C_FileAnalyze::~C_FileAnalyze() {
  * @Return Value	: 返回结果对象
  * @Example			:
  */
-const C_Result* C_FileAnalyze::GetResult() {
+const C_BaseResult* C_FileAnalyze::GetResult() {
 	return m_pResult;
 }
 
 /*
- * @Function Name	: SetFileType
- * @Parameter [in] EM_FileType: emFileType --- 文件类型
- * @Description		: 设置文件类型
- * @Return Value	:
+ * @Function Name	: SetRule
+ * @Parameter [in] const C_BaseRule* pRule --- 文件匹配规则
+ * @Description		: 设置匹配规则
+ * @Return Value	: void
  * @Example			:
  */
-void C_FileAnalyze::SetFileType(EM_FileType emFileType) {
+void C_FileAnalyze::SetRule(const C_BaseRule* pRule) {
 
-	this->m_emFileType = emFileType;
+	m_pRule = pRule->CreateObj();
+}
+
+/*
+ * @Function Name	: SetResult
+ * @Parameter [in] C_BaseResult* pResult
+ * @Description		: 文件匹配结果
+ * @Return Value	: void
+ * @Example			:
+ */
+void C_FileAnalyze::SetResult(C_BaseResult* pResult) {
+	m_pResult = pResult;
 }
 
 /*
@@ -153,6 +173,7 @@ const EM_FileType C_FileAnalyze::GetFileType() {
 
 	return this->m_emFileType;
 }
+
 /*
  * @Function Name	: GetFileType
  * @Description		: 根据文件内容分析文件类型
@@ -279,23 +300,22 @@ bool C_FileAnalyze::GetType() {
 	m_emFileType = en_txt;
 
 }
+
 /*
  *	@Function Name	: Analyze
  *	@Description 	: 对文件进行分析匹配
  *	@Return Value	: 返回操作状态
  *	@Example			:
  */
-bool C_FileAnalyze::Analyze(const C_BaseRule* pRule) {
+bool C_FileAnalyze::Analyze() {
 
-	if (NULL == pRule) {
-		cout << "匹配规则不能为空" << endl;
+	if (NULL == m_pRule) {
+		cout<<"匹配规则对象未设置"<< endl;
 		return false;
 	}
 
-	// 创建结果对象，并初始化结果对象
-	m_pResult = new C_Result();
-	if (m_pResult == NULL) {
-		cout << "初始化结果对象失败" << endl;
+	if (NULL == m_pResult) {
+		cout<<"匹配结果对象未设置"<<endl;
 		return false;
 	}
 
@@ -305,46 +325,46 @@ bool C_FileAnalyze::Analyze(const C_BaseRule* pRule) {
 	}
 	switch (m_emFileType) {
 	case en_txt:
-		m_pFile = new C_TxtFile();
+		m_pFile = new C_TxtFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_off:
-		m_pFile = new C_OffFile();
+		m_pFile = new C_OffFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_rar:
-		m_pFile = new C_RarFile();
+		m_pFile = new C_RarFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_zip:
-		m_pFile = new C_ZipFile();
+		m_pFile = new C_ZipFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_gz:
-		m_pFile = new C_GzFile();
+		m_pFile = new C_GzFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_pdf:
-		m_pFile = new C_PdfFile();
+		m_pFile = new C_PdfFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_tar:
-		m_pFile = new C_TarFile();
+		m_pFile = new C_TarFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_7zip:
-		m_pFile = new C_7zipFile();
+		m_pFile = new C_7zipFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_xml:
-		m_pFile = new C_XmlFile();
+		m_pFile = new C_XmlFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_rtf:
-		m_pFile = new C_RtfFile();
+		m_pFile = new C_RtfFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	case en_html:
-		m_pFile = new C_HtmlFile();
+		m_pFile = new C_HtmlFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
 	default:
 		m_pFile = NULL;
 	}
+
 	if (NULL == m_pFile) {
 		cout << "文件类型识别失败" << endl;
 		return false;
 	}
 
-	return m_pFile->Match(pRule, m_pResult);
 }
 

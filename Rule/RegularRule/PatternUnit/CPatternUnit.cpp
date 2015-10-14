@@ -5,7 +5,7 @@
  *      Author: SmallCroco
  */
 
-#include "CPatternUnit.h"
+#include <RegularRule/PatternUnit/CPatternUnit.h>
 #include <stdlib.h>
 
 /*

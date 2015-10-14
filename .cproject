@@ -24,11 +24,14 @@
 								<option id="org.eclipse.cdt.msvc.cl.option.optimization.1830760849" name="Optimization" superClass="org.eclipse.cdt.msvc.cl.option.optimization" value="org.eclipse.cdt.msvc.cl.option.optimization.default" valueType="enumerated"/>
 								<option id="org.eclipse.cdt.msvc.cl.option.debugFormat.737976613" name="Debug Information Format" superClass="org.eclipse.cdt.msvc.cl.option.debugFormat" value="org.eclipse.cdt.msvc.cl.option.debugFormat.complete" valueType="enumerated"/>
 								<option id="org.eclipse.cdt.msvc.cl.option.includes.536511451" name="Include Path (/I)" superClass="org.eclipse.cdt.msvc.cl.option.includes" valueType="includePath">
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Rule"/>
-									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Rule/Regular"/>
-									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Rule/Regular/PatternUnit"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Rule/RegularRule"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Rule/KeywordsRule"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Rule/RegularRule/PatternUnit"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Result"/>
-									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Result/OtherHeader"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Result/RegularResult"/>
+									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Result/KeywordsResult"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/XmlFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/RtfFile"/>
@@ -41,7 +44,6 @@
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/OffFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/GzFile"/>
 									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile/Content/7zipFile"/>
-									<listOptionValue builtIn="false" value="/home/smallcroco/workspace/AnalyzFile"/>
 								</option>
 								<inputType id="org.eclipse.cdt.msvc.cl.inputType.2141875007" superClass="org.eclipse.cdt.msvc.cl.inputType"/>
 							</tool>
@@ -54,9 +56,13 @@
 									<listOptionValue builtIn="false" value="doctotext"/>
 									<listOptionValue builtIn="false" value="unrar"/>
 									<listOptionValue builtIn="false" value="pcre"/>
+									<listOptionValue builtIn="false" value="pcre16"/>
+									<listOptionValue builtIn="false" value="pcre32"/>
+									<listOptionValue builtIn="false" value="uchardet"/>
 								</option>
 								<option id="org.eclipse.cdt.msvc.link.option.libpath.155502781" name="Additional Libpath (/libpath)" superClass="org.eclipse.cdt.msvc.link.option.libpath" valueType="stringList">
 									<listOptionValue builtIn="false" value="/usr/lib"/>
+									<listOptionValue builtIn="false" value="/usr/lib/pcre8.37"/>
 								</option>
 								<inputType id="org.eclipse.cdt.msvc.link.inputType.514075434" superClass="org.eclipse.cdt.msvc.link.inputType"/>
 							</tool>

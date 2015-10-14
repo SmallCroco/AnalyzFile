@@ -1,24 +1,24 @@
 /*
- * CPatternUnitUTF8.cpp
+ * CPatternUnitGB18030.cpp
  *
  *  Created on: 2015��9��28��
  *      Author: SmallCroco
  */
 
-#include "CPatternUnitUTF8.h"
+#include <RegularRule/PatternUnit/CPatternUnitGB18030.h>
 #include "pcre.h"
 #include <iostream>
 
 using namespace std;
 
-C_PatternUnit_UTF8::C_PatternUnit_UTF8() {
-	// TODO Auto-generated constructor stub
+C_PatternUnit_GB18030::C_PatternUnit_GB18030() {
+
 	m_pPcre = NULL;
 	m_pPcreExtra = NULL;
 }
 
-C_PatternUnit_UTF8::~C_PatternUnit_UTF8() {
-	// TODO Auto-generated destructor stub
+C_PatternUnit_GB18030::~C_PatternUnit_GB18030() {
+
 	if (NULL != m_pPcre) {
 		pcre_free(m_pPcre);
 		m_pPcre = NULL;
@@ -30,25 +30,23 @@ C_PatternUnit_UTF8::~C_PatternUnit_UTF8() {
 	}
 }
 
-int C_PatternUnit_UTF8::PcreCompile() {
+int C_PatternUnit_GB18030::PcreCompile() {
 
 	const char* error;
 	int erroffset;
 
-	m_pPcre = pcre_compile((PCRE_SPTR)m_pContent,
-				PCRE_NO_AUTO_CAPTURE | PCRE_UTF8 | PCRE_NO_UTF8_CHECK
-						| PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE, &error,
-				&erroffset,
-				NULL);
+	m_pPcre = pcre_compile((PCRE_SPTR)m_pContent, PCRE_NO_AUTO_CAPTURE |
+			PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE,
+			&error, &erroffset, NULL);
 
 	if (NULL == m_pPcre) {
-		cout<<"PCRE UTF8 compilation failed at offset "<<erroffset<<": "<<error<<endl;
+		cout<<"PCRE gb18030 compilation failed at offset "<<erroffset<<": "<<error<<endl;
 		return -1;
 	}
 
 	m_pPcreExtra = pcre_study(m_pPcre, PCRE_STUDY_JIT_COMPILE, &error);
 	if (NULL == m_pPcreExtra) {
-		cout<<"PCRE UTF8 pcre_study failed: "<<error<<endl;
+		cout<<"PCRE gb18030 pcre_study failed: "<<error<<endl;
 	}
 
 	return 0;
@@ -58,7 +56,7 @@ int C_PatternUnit_UTF8::PcreCompile() {
  * @Function Name	: getPcre
  * @Description		: 获取pcre正则表达式指针
  */
-const void* C_PatternUnit_UTF8::getPcre() {
+const void* C_PatternUnit_GB18030::getPcre() {
 
 		return (const void*)m_pPcre;
 }
@@ -67,7 +65,7 @@ const void* C_PatternUnit_UTF8::getPcre() {
  * @Function Name	: getPcreExtra
  * @Description		: 获取pcreExtra指针
  */
-const void* C_PatternUnit_UTF8::getPcreExtra() {
+const void* C_PatternUnit_GB18030::getPcreExtra() {
 
 		return (const void*)m_pPcreExtra;
 }

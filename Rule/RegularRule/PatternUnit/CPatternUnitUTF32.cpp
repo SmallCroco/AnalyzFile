@@ -5,7 +5,7 @@
  *      Author: SmallCroco
  */
 
-#include "CPatternUnitUTF32.h"
+#include <RegularRule/PatternUnit/CPatternUnitUTF32.h>
 #include "pcre.h"
 #include <iostream>
 

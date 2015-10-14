@@ -5,7 +5,7 @@
  *      Author: SmallCroco
  */
 
-#include "CRegularRule.h"
+#include <RegularRule/CRegularRule.h>
 #include <iostream>
 
 #define MAX_PATTERNS_FILE_LINE_LENG 2500
@@ -19,13 +19,21 @@ using namespace std;
 C_RegularRule::C_RegularRule() {
 
 	this->m_gb18030Patterns.clear();
+
 	this->m_utf8Patterns.clear();
+
 	this->m_utf16Patterns.clear();
+
 	this->m_utf16lePatterns.clear();
+
 	this->m_utf16bePatterns.clear();
+
 	this->m_utf32Patterns.clear();
+
 	this->m_utf32lePatterns.clear();
+
 	this->m_utf32bePatterns.clear();
+
 }
 
 /*
@@ -222,6 +230,7 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 			} else {
 				m_utf8Patterns.push_back(punit_utf8);
 			}
+
 		}
 
 		if ((encode & en_utf_16) != 0) {
@@ -250,6 +259,7 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 					m_utf16Patterns.push_back(punit_utf16);
 				}
 			}
+
 		}
 
 		if ((encode & en_utf_16le) != 0) {
@@ -426,6 +436,7 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 					m_gb18030Patterns.push_back(punit_gb18030);
 				}
 			}
+
 		}
 
 		if (NULL != pName) {
@@ -450,8 +461,69 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
  */
 C_BaseRule* C_RegularRule::CreateObj() {
 
-	C_BaseRule* rule = new C_RegularRule();
-
-	return rule;
+	return new C_RegularRule(*this);
 }
 
+bool C_RegularRule::isUtf8() {
+	if (m_utf8Patterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isUtf16() {
+	if (m_utf16Patterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isUtf16le() {
+	if (m_utf16lePatterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isUtf16be() {
+	if (m_utf16bePatterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isUtf32() {
+	if (m_utf32Patterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isUtf32le() {
+	if (m_utf32lePatterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isUtf32be() {
+	if (m_utf32bePatterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+bool C_RegularRule::isGb18030() {
+	if (m_gb18030Patterns.size() > 0) {
+		return true;
+	} else {
+		return false;
+	}
+}

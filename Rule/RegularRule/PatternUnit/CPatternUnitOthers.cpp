@@ -5,7 +5,7 @@
  *      Author: SmallCroco
  */
 
-#include "CPatternUnitOthers.h"
+#include <RegularRule/PatternUnit/CPatternUnitOthers.h>
 #include "pcre.h"
 #include <iostream>
 

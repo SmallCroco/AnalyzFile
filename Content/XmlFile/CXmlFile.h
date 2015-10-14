@@ -11,11 +11,17 @@
 #include "CBaseFile.h"
 
 class C_XmlFile: public C_BaseFile {
+
 public:
-	C_XmlFile(const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	// 构造函数
+	C_XmlFile(const char* pszFilePath, const char* pszFileData,
+			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+
+	// 析构函数
 	~C_XmlFile();
 
 private:
+	// 提取文本
 	bool ExtractTxt();
 };
 
