@@ -8,7 +8,9 @@
 #ifndef CFILEANALYZE_H_
 #define CFILEANALYZE_H_
 
-#include "CResult.h"
+#include "CBaseFile.h"
+#include "CBaseResult.h"
+#include "CBaseRule.h"
 
 class C_FileAnalyze {
 public:
@@ -22,10 +24,10 @@ public:
 	~C_FileAnalyze();
 
 	// 设置匹配规则
-	void SetRule(const C_BaseRule* pRule);
+	void SetRule(C_BaseRule* pRule);
 
 	// 设置匹配结果
-	void SetResult(C_BaseResult* pResult);
+	void SetResult(C_RegularResult* pResult);
 
 	// 获取文件类型
 	const EM_FileType GetFileType();
@@ -37,6 +39,7 @@ public:
 	bool Analyze();
 
 private:
+	// 判断文件类型
 	bool GetType();
 
 private:
@@ -45,9 +48,9 @@ private:
 	unsigned long	m_ulFileLen;		// 文件内容长度
 	EM_FileType		m_emFileType;	// 文件类型
 
-	C_BaseFile*		m_pFile;			// 文件对象基指针
-	C_BaseResult*	m_pResult;		// 文件结果基指针
-	C_BaseRule* 		m_pRule;　		// 文件规则基指针
+	C_BaseFile*			m_pFile;			// 文件对象基指针
+	C_RegularResult*	m_pResult;		// 文件结果基指针
+	C_BaseRule*			m_pRule;			// 文件规则基指针
 };
 
 #endif /* CFILEANALYZE_H_ */

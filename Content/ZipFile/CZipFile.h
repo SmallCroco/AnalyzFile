@@ -14,14 +14,17 @@ class C_ZipFile: public C_BaseFile {
 
 public:
 	// 构造函数
-	C_ZipFile(const char* pszFilePath, const char* pszFileData,
-			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	C_ZipFile(const char* pszFilePath, const unsigned char* pszFileData,
+			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknowEncode);
 
 	// 析构函数
 	~C_ZipFile();
 
+	// 分析文件
+	bool AnalyzeFile();
+
 private:
-	// 文本提取
+	// 提取压缩文件
 	bool ExtractTxt();
 
 	// 解压zip包

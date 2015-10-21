@@ -14,14 +14,17 @@ class C_TarFile: public C_BaseFile {
 
 public:
 	// 构造函数
-	C_TarFile(const char* pszFilePath, const char* pszFileData,
-			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	C_TarFile(const char* pszFilePath, const unsigned char* pszFileData,
+			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknowEncode);
 
 	// 析构函数
 	~C_TarFile();
 
+	// 文件分析
+	bool AnalyzeFile();
+
 private:
-	// 文本提取
+	// 提取打包文件
 	bool ExtractTxt();
 };
 

@@ -8,6 +8,8 @@
 #ifndef RULE_REGULAR_CPATTERNUNIT_H_
 #define RULE_REGULAR_CPATTERNUNIT_H_
 
+#include "pcre.h"
+
 class C_PatternUnit {
 public:
 	C_PatternUnit();
@@ -21,7 +23,7 @@ protected:
 	virtual int PcreCompile() = 0;
 
 
-protected:
+public:
 	int				m_nPid;
 	char*			m_pName;
 	char*			m_pContent;

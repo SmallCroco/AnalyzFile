@@ -8,9 +8,9 @@
 #ifndef CONTENT_CBASEFILE_H_
 #define CONTENT_CBASEFILE_H_
 
+#include "CRegularResult.h"
 #include <iostream>
 #include "CBaseRule.h"
-#include "CResult.h"
 
 using std::string;
 
@@ -18,8 +18,8 @@ class C_BaseFile {
 public:
 
 	// 构造文件对象
-	C_BaseFile(const char* pszFilePath, const char* pszFileData,
-			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknow);
+	C_BaseFile(const char* pszFilePath, const unsigned char* pszFileData,
+			unsigned long ulFileLen, EM_FileEncode emEncode = en_unknowEncode);
 
 	// 析构函数
 	virtual ~C_BaseFile();
@@ -40,16 +40,17 @@ public:
 	EM_FileEncode GetEncode();
 
 	// 设置匹配规则
-	void SetRule(const C_BaseRule* pRule);
+	void SetRule(C_BaseRule* pRule);
 
 	// 设置匹配结果
-	void SetResult(C_BaseResult* pResult);
+	void SetResult(C_RegularResult* pResult);
+
+	// 分析文件
+	virtual bool AnalyzeFile() = 0;
 
 private:
-	// 获取文本编码方式
-	bool GetFileEncode();
 
-	// 提取文本
+	// 提取文件内容
 	virtual bool ExtractTxt() = 0;
 
 protected:
@@ -61,8 +62,8 @@ protected:
 
 	EM_FileEncode	m_emEncode;		// 文件文本编码方式
 
-	C_BaseRule*		m_pRule;			// 文件匹配规则
-	C_BaseResult* 	m_pResult;		// 文件匹配结果
+	C_BaseRule*			m_pRule;			// 文件匹配规则
+	C_RegularResult* 	m_pResult;		// 文件匹配结果
 };
 
 #endif /* CONTENT_CBASEFILE_H_ */

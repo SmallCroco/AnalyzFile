@@ -7,12 +7,13 @@
 
 #include "CZipFile.h"
 #include "unzip.h"
+#include "CFileAnalyze.h"
 #include <sys/stat.h>
 #include <iostream>
 
 using namespace std;
 
-C_ZipFile::C_ZipFile(const char* pszFilePath, const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
+C_ZipFile::C_ZipFile(const char* pszFilePath, const unsigned char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
 	C_BaseFile(pszFilePath, pszFileData, ulFileLen, emEncode){
 
 }
@@ -31,6 +32,8 @@ bool C_ZipFile::ExtractTxt() {
 	bool flag = false;
 
 	flag = UnZipFile();
+
+	return flag;
 
 }
 
@@ -53,13 +56,20 @@ bool C_ZipFile::UnZipFile(const char* pszPassword) {
 	}
 
 	// 循环解压zip包中的每一个文件
-	for (int i = 0; i < gi.number_entry; i++) {
+	for (unsigned int i = 0; i < gi.number_entry; i++) {
 		unz_file_info64 file_info;	// 文件信息
 		char filename_inzip[256];		// zip包中的文件名
 
+		// 获取当前文件信息
 		err = unzGetCurrentFileInfo64(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL, 0, NULL, 0);
 		if (err != UNZ_OK) {
 			cout<<"error "<<err<<" with zipfilein unzGetCurrentFileInfo64"<<endl;
+
+			//　关闭文件句柄
+			err = unzCloseCurrentFile(uf);
+			if (err != UNZ_OK) {
+				cout<<"error "<<err<<" with zipfile in unzCloseCurrentFile"<<endl;
+			}
 			return false;
 		}
 
@@ -74,32 +84,35 @@ bool C_ZipFile::UnZipFile(const char* pszPassword) {
 			p++;
 		}
 
-		// 判断是文件夹还是文件
-		if ((*filename_withoutpath) == '\0') {
-			// 文件夹，创建文件夹
-			if (mkdir(filename_inzip, 0775) == -1) {
-				cout<<"error： with create"<<filename_inzip<<"failed"<<endl;
-				break;
-			}
-		} else {
-			// 文件
+		// 判断是文件夹还是文件,文件夹不处理
+		if ((*filename_withoutpath) != '\0') {
+			// 打开当前文件
 			err = unzOpenCurrentFilePassword(uf, pszPassword);
 			if (err != UNZ_OK) {
 				cout<<"error: "<<err<<" with zipfile in unzOpenCurrentFilePassword,zip包文件是一个加密包"<<endl;
+
+				// 关闭文件句柄
+				err = unzCloseCurrentFile(uf);
+				if (err != UNZ_OK) {
+					cout<<"error "<<err<<" with zipfile in unzCloseCurrentFile"<<endl;
+				}
 				return false;
 			}
 
-			FILE* fout = fopen64(filename_inzip, "wb");
+			// 创建新文件
+			FILE* fout = fopen64(filename_withoutpath, "wb");
 			if ((fout == NULL)) {
-				cout<<"创建zip包中的"<<filename_inzip<<"失败"<<endl;
-				return false;
+				cout<<"创建zip包中的"<<filename_withoutpath<<"失败"<<endl;
+				break;
 			}
 
+			// 写入文件内容
 			if (fout != NULL) {
 				uInt size_buf = 8192;
 				void* buf = (void*) malloc(size_buf);
 
 				do {
+					// 读取当前文件内容
 					err = unzReadCurrentFile(uf, buf, size_buf);
 					if (err < 0) {
 						cout<<"error "<<err<<" with zipfile in unzReadCurrentFile"<<endl;
@@ -122,18 +135,22 @@ bool C_ZipFile::UnZipFile(const char* pszPassword) {
 				free(buf);
 			}
 
-			// 进一步分析文件
-			C_FileAnalyze file = new C_FileAnalyze(filename_inzip);
-			file.SetRule(m_pRule);
-			file.SetResult(m_pResult);
+			// err 等于零表示文件正常写入并结尾
+			if (err == 0) {
+				// 进一步分析文件
+				C_FileAnalyze* file = new C_FileAnalyze(filename_withoutpath);
+				file->SetRule(m_pRule);
+				file->SetResult(m_pResult);
 
-			file.Analyze();
+				if (file->Analyze() == false) {
+					cout<<filename_withoutpath<<"分析失败"<<endl;
+				}
 
-			delete file;
+				delete file;
+			}
 
 			// 删除文件
-			remove(filename_inzip);
-
+			remove(filename_withoutpath);
 		}
 
 		// 指向下一个文件
@@ -157,4 +174,10 @@ bool C_ZipFile::UnZipFile(const char* pszPassword) {
 	}
 
 	return true;
+}
+
+bool C_ZipFile::AnalyzeFile() {
+
+	// 获取解压文件
+	return this->ExtractTxt();
 }

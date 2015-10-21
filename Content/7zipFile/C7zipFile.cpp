@@ -16,7 +16,7 @@
  * @Description 	: 构造函数
  * @Return Value	:
  */
-C_7zipFile::C_7zipFile(const char* pszFilePath, const char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
+C_7zipFile::C_7zipFile(const char* pszFilePath, const unsigned char* pszFileData, unsigned long ulFileLen, EM_FileEncode emEncode):
 	C_BaseFile(pszFilePath, pszFileData, ulFileLen, emEncode){
 
 }
@@ -38,4 +38,14 @@ C_7zipFile::~C_7zipFile() {
 bool C_7zipFile::ExtractTxt() {
 
 	return true;
+}
+
+bool C_7zipFile::AnalyzeFile() {
+
+	bool bl = false;
+
+	// 解压7zip文件
+	bl = ExtractTxt();
+
+	return bl;
 }

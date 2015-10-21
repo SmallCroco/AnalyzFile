@@ -12,13 +12,13 @@
 
 class C_PatternUnit_UTF32: public C_PatternUnit {
 public:
+	C_PatternUnit_UTF32(const C_PatternUnit_UTF32& unit);
 	C_PatternUnit_UTF32();
 	~C_PatternUnit_UTF32();
 
 	const void* getPcre();
 	const void* getPcreExtra();
 
-protected:
 	int PcreCompile();
 
 private:

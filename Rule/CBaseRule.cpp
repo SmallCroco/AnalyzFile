@@ -13,6 +13,7 @@
 using namespace std;
 
 C_BaseRule::~C_BaseRule() {
+
 }
 
 bool C_BaseRule::ChangeTextEncode(EM_FileEncode emSrcEncode, EM_FileEncode emDestEncode,

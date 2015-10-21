@@ -5,8 +5,13 @@
  *      Author: SmallCroco
  */
 
-#include <RegularRule/CRegularRule.h>
+#include "CRegularRule.h"
+#include "CRegularResult.h"
+#include "FileStruct.h"
+#include <string.h>
+#include <stdio.h>
 #include <iostream>
+
 
 #define MAX_PATTERNS_FILE_LINE_LENG 2500
 
@@ -36,6 +41,49 @@ C_RegularRule::C_RegularRule() {
 
 }
 
+C_RegularRule::C_RegularRule(C_RegularRule& rule) {
+	for (vector<C_PatternUnit_UTF8*>::iterator li = rule.m_utf8Patterns.begin();
+			li != rule.m_utf8Patterns.end(); ++li) {
+		C_PatternUnit_UTF8* unit = new C_PatternUnit_UTF8(**li);
+		this->m_utf8Patterns.push_back(unit);
+	}
+
+	for (vector<C_PatternUnit_UTF16*>::iterator li = rule.m_utf16Patterns.begin();
+			li != rule.m_utf16Patterns.end(); ++li) {
+		C_PatternUnit_UTF16* unit = new C_PatternUnit_UTF16(**li);
+		this->m_utf16Patterns.push_back(unit);
+	}
+	for (vector<C_PatternUnit_UTF16*>::iterator li = rule.m_utf16lePatterns.begin();
+			li != rule.m_utf16lePatterns.end(); ++li) {
+		C_PatternUnit_UTF16* unit = new C_PatternUnit_UTF16(**li);
+		this->m_utf16lePatterns.push_back(unit);
+	}
+	for (vector<C_PatternUnit_UTF16*>::iterator li = rule.m_utf16bePatterns.begin();
+			li != rule.m_utf16bePatterns.end(); ++li) {
+		C_PatternUnit_UTF16* unit = new C_PatternUnit_UTF16(**li);
+		this->m_utf16bePatterns.push_back(unit);
+	}
+	for (vector<C_PatternUnit_UTF32*>::iterator li = rule.m_utf32Patterns.begin();
+			li != rule.m_utf32Patterns.end(); ++li) {
+		C_PatternUnit_UTF32* unit = new C_PatternUnit_UTF32(**li);
+		this->m_utf32Patterns.push_back(unit);
+	}
+	for (vector<C_PatternUnit_UTF32*>::iterator li = rule.m_utf32lePatterns.begin();
+			li != rule.m_utf32lePatterns.end(); ++li) {
+		C_PatternUnit_UTF32* unit = new C_PatternUnit_UTF32(**li);
+		this->m_utf32lePatterns.push_back(unit);
+	}
+	for (vector<C_PatternUnit_UTF32*>::iterator li = rule.m_utf32Patterns.begin();
+			li != rule.m_utf32Patterns.end(); ++li) {
+		C_PatternUnit_UTF32* unit = new C_PatternUnit_UTF32(**li);
+		this->m_utf32bePatterns.push_back(unit);
+	}
+	for (vector<C_PatternUnit_GB18030*>::iterator li = rule.m_gb18030Patterns.begin();
+			li != rule.m_gb18030Patterns.end(); ++li) {
+		C_PatternUnit_GB18030* unit = new C_PatternUnit_GB18030(**li);
+		this->m_gb18030Patterns.push_back(unit);
+	}
+}
 /*
  * @Function Name	: ~C_RegularRule
  * @Description		: 析构函数
@@ -277,9 +325,7 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 					2 * MAX_PATTERNS_FILE_LINE_LENG);
 
 			char* pout_utf16le = punit_utf16le->m_pContent;
-			bl = ChangeTextEncode(en_utf_8, en_utf_16le, pin_utf16le,
-					(size_t*) &inLen_utf16le, pout_utf16le,
-					(size_t*) &outLen_utf16le);
+			bl = ChangeTextEncode(en_utf_8, en_utf_16le, pin_utf16le,	(size_t*) &inLen_utf16le, pout_utf16le, (size_t*)&outLen_utf16le);
 			if (false == bl) {
 				delete punit_utf16le;
 			} else {
@@ -453,77 +499,633 @@ int C_RegularRule::InitRules(const char* pszFilePath, int encode) {
 	return 0;
 }
 
-/*
- * @Function Name	: CreateObject
- * @Description		: 通过该方法构造本类的实例
- * @Return Value	: 返回本类的对象实例
- * 	@Example			:
- */
 C_BaseRule* C_RegularRule::CreateObj() {
 
 	return new C_RegularRule(*this);
 }
 
-bool C_RegularRule::isUtf8() {
-	if (m_utf8Patterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::asciiMatch(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li =
+			m_gb18030Patterns.begin(); li != m_gb18030Patterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre *) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+
+		}
+	}
+
+}
+
+
+void C_RegularRule::iso8599Match(const char* pszFileText, int bufLen,  C_RegularResult* result) {
+
+}
+
+void C_RegularRule::utf7Match(const char* pszFileText, int bufLen, C_RegularResult* result) {
+
+}
+
+void C_RegularRule::utf8Match(const char* pszFileText, int bufLen, C_RegularResult* result) {
+
+}
+
+void C_RegularRule::utf16Match(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF16*>::iterator li = m_utf16Patterns.begin();
+			li != m_utf16Patterns.end(); ++li) {
+
+		for (int offset = 0; offset < bufLen/2;) {
+			rc = pcre16_exec((pcre16 *) (*li)->getPcre(),
+					(const pcre16_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR16) pszFileText, bufLen/2, offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF16_CHECK, ovector, 12);
+			if (rc < 0) {
+				break;
+			}
+
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0] * 2;
+			amatch.matchLen = (ovector[1] - ovector[0])*2;
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+			offset = ovector[1];
+		}
 	}
 }
 
-bool C_RegularRule::isUtf16() {
-	if (m_utf16Patterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::utf16leMatch(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF16*>::iterator li =
+			m_utf16lePatterns.begin(); li != m_utf16lePatterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen / 2;) {
+			rc = pcre16_exec((const pcre16*) (*li)->getPcre(),
+					(const pcre16_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR16) pszFileText, (bufLen/2), offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF16_CHECK, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0] * 2;
+			amatch.matchLen = (ovector[1] - ovector[0]) * 2;
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+			offset = ovector[1];
+
+		}
 	}
 }
 
-bool C_RegularRule::isUtf16le() {
-	if (m_utf16lePatterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::utf16beMatch(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF16*>::iterator li =
+			m_utf16bePatterns.begin(); li != m_utf16bePatterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen/2;) {
+			rc = pcre16_exec((pcre16 *) (*li)->getPcre(),
+					(const pcre16_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR16) pszFileText, bufLen/2, offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF16_CHECK, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0] * 2;
+			amatch.matchLen = (ovector[1] - ovector[0]) * 2;
+
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+		}
 	}
 }
 
-bool C_RegularRule::isUtf16be() {
-	if (m_utf16bePatterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::utf32Match(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF32*>::iterator li = m_utf32Patterns.begin();
+			li != m_utf32Patterns.end(); ++li) {
+
+		for (int offset = 0; offset < bufLen/4;) {
+			rc = pcre32_exec((pcre32 *) (*li)->getPcre(),
+					(const pcre32_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR32) pszFileText, bufLen/4, offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF32_CHECK, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0] * 4;
+			amatch.matchLen = (ovector[1] - ovector[0]) * 4;
+			int flag = 0;
+
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+		}
 	}
 }
 
-bool C_RegularRule::isUtf32() {
-	if (m_utf32Patterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::utf32leMatch(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF32*>::iterator li =
+			m_utf32lePatterns.begin(); li != m_utf32lePatterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen/4;) {
+			rc = pcre32_exec((pcre32 *) (*li)->getPcre(),
+					(const pcre32_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR32) pszFileText, bufLen/4, offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF32_CHECK, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0] * 4;
+			amatch.matchLen = (ovector[1] - ovector[0]) * 4;
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+
+		}
 	}
 }
 
-bool C_RegularRule::isUtf32le() {
-	if (m_utf32lePatterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::utf32beMatch(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF32*>::iterator li =
+			m_utf32bePatterns.begin(); li != m_utf32bePatterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen/4;) {
+			rc = pcre32_exec((pcre32 *) (*li)->getPcre(),
+					(const pcre32_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR32) pszFileText, bufLen/4, offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF32_CHECK, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0] * 4;
+			amatch.matchLen = (ovector[1] - ovector[0]) * 4;
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+		}
 	}
 }
 
-bool C_RegularRule::isUtf32be() {
-	if (m_utf32bePatterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::gbkMatch(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li =	m_gb18030Patterns.begin(); li != m_gb18030Patterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre *) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+
+		}
+	}
+
+}
+
+void C_RegularRule::gb2312Match(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li =
+			m_gb18030Patterns.begin(); li != m_gb18030Patterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre *) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+
+		}
+	}
+
+}
+
+void C_RegularRule::gb18030Match(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li =
+			m_gb18030Patterns.begin(); li != m_gb18030Patterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre *) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+		}
 	}
 }
 
-bool C_RegularRule::isGb18030() {
-	if (m_gb18030Patterns.size() > 0) {
-		return true;
-	} else {
-		return false;
+void C_RegularRule::big5Match(const char* pszFileText, int bufLen, C_RegularResult* res) {
+
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li =
+			m_gb18030Patterns.begin(); li != m_gb18030Patterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre *) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+		}
 	}
 }

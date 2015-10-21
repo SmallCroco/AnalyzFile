@@ -20,6 +20,7 @@ using std::vector;
 
 class C_RegularRule: public C_BaseRule {
 public:
+	C_RegularRule(C_RegularRule &rule);
 	C_RegularRule();
 	~C_RegularRule();
 
@@ -27,14 +28,20 @@ public:
 
 	C_BaseRule* CreateObj();
 
-	bool isUtf8();
-	bool isUtf16();
-	bool isUtf16le();
-	bool isUtf16be();
-	bool isUtf32();
-	bool isUtf32le();
-	bool isUtf32be();
-	bool isGb18030();
+	void asciiMatch(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void iso8599Match(const char* pszFileText, int bufLen,  C_RegularResult* result);
+	void utf7Match(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf8Match(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf16Match(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf16leMatch(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf16beMatch(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf32Match(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf32leMatch(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void utf32beMatch(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void gbkMatch(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void gb2312Match(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void gb18030Match(const char* pszFileText, int bufLen, C_RegularResult* result);
+	void big5Match(const char* pszFileText, int bufLen, C_RegularResult* result);
 
 private:
 	vector<C_PatternUnit_UTF8*> 		m_utf8Patterns;

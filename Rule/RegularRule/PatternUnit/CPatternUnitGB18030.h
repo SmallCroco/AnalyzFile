@@ -12,13 +12,13 @@
 
 class C_PatternUnit_GB18030: public C_PatternUnit {
 public:
+	C_PatternUnit_GB18030(const C_PatternUnit_GB18030& unit);
 	C_PatternUnit_GB18030();
 	~C_PatternUnit_GB18030();
 
 	const void* getPcre();
 	const void* getPcreExtra();
 
-protected:
 	int PcreCompile();
 
 private:

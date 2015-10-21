@@ -7,6 +7,7 @@
 
 #include <RegularRule/PatternUnit/CPatternUnitGB18030.h>
 #include "pcre.h"
+#include <string.h>
 #include <iostream>
 
 using namespace std;
@@ -15,6 +16,35 @@ C_PatternUnit_GB18030::C_PatternUnit_GB18030() {
 
 	m_pPcre = NULL;
 	m_pPcreExtra = NULL;
+}
+
+C_PatternUnit_GB18030::C_PatternUnit_GB18030(const C_PatternUnit_GB18030& unit) {
+	this->m_nContentLen = unit.m_nContentLen;
+	this->m_nPid = unit.m_nPid;
+	this->m_pContent = new char[m_nContentLen];
+	memset(m_pContent, 0, m_nContentLen);
+	memcpy(m_pContent, unit.m_pContent, m_nContentLen);
+
+	this->m_pName = new char[strlen(unit.m_pName)];
+	memset(m_pName, 0, strlen(unit.m_pName));
+	memcpy(m_pName, unit.m_pName, strlen(unit.m_pName));
+
+	const char* error;
+	int erroffset;
+
+	if (unit.m_pPcre != NULL) {
+		this->m_pPcre = pcre_compile((PCRE_SPTR)m_pContent, PCRE_NO_AUTO_CAPTURE |
+				PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE,
+				&error, &erroffset, NULL);
+	} else {
+		this->m_pPcre = NULL;
+	}
+
+	if (unit.m_pPcreExtra != NULL) {
+		this->m_pPcreExtra = pcre_study(m_pPcre, PCRE_STUDY_JIT_COMPILE, &error);
+	} else {
+		this->m_pPcreExtra = NULL;
+	}
 }
 
 C_PatternUnit_GB18030::~C_PatternUnit_GB18030() {

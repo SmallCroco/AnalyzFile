@@ -7,8 +7,21 @@
 
 #include "CFileAnalyze.h"
 #include "FileStruct.h"
+#include "CGzFile.h"
+#include "CTarFile.h"
+#include "C7zipFile.h"
+#include "CZipFile.h"
+#include "CXmlFile.h"
+#include "CHtmlFile.h"
+#include "CTxtFile.h"
+#include "CRarFile.h"
+#include "CRtfFile.h"
+#include "CPdfFile.h"
+#include "COffFile.h"
 #include <iostream>
+#include <malloc.h>
 #include <stdio.h>
+#include <string.h>
 
 using namespace std;
 
@@ -34,14 +47,14 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath, EM_FileType emFileType):m_
 
 		FILE* fp = fopen(m_pszFilePath, "rb");
 		if (NULL == fp) {
-			break;
+			return;
 		}
 
 		fseek(fp, 0L, SEEK_END);
 		long len = ftell(fp);
 		if (-1L == len) {
 			fclose(fp);
-			break;
+			return;
 		} else {
 			m_ulFileLen = len;
 			rewind(fp);
@@ -54,7 +67,7 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath, EM_FileType emFileType):m_
 			m_ulFileLen = 0;
 
 			fclose(fp);
-			break;
+			return ;
 		}
 		if (m_ulFileLen
 				!= (unsigned long) fread(m_pszFileData, sizeof(unsigned char),
@@ -64,7 +77,7 @@ C_FileAnalyze::C_FileAnalyze(const char* pszFilePath, EM_FileType emFileType):m_
 			free(m_pszFileData);
 
 			fclose(fp);
-			break;
+			return;
 		}
 
 		fclose(fp);
@@ -147,7 +160,7 @@ const C_BaseResult* C_FileAnalyze::GetResult() {
  * @Return Value	: void
  * @Example			:
  */
-void C_FileAnalyze::SetRule(const C_BaseRule* pRule) {
+void C_FileAnalyze::SetRule(C_BaseRule* pRule) {
 
 	m_pRule = pRule->CreateObj();
 }
@@ -159,7 +172,7 @@ void C_FileAnalyze::SetRule(const C_BaseRule* pRule) {
  * @Return Value	: void
  * @Example			:
  */
-void C_FileAnalyze::SetResult(C_BaseResult* pResult) {
+void C_FileAnalyze::SetResult(C_RegularResult* pResult) {
 	m_pResult = pResult;
 }
 
@@ -297,7 +310,9 @@ bool C_FileAnalyze::GetType() {
 		return true;
 	}
 
-	m_emFileType = en_txt;
+	m_emFileType = en_unknow;
+
+	return false;
 
 }
 
@@ -321,42 +336,55 @@ bool C_FileAnalyze::Analyze() {
 
 	// 如果文件类型对象为未知类型，则获取文件类型
 	if (m_emFileType == en_unknow) {
-		m_emFileType = this->GetFileType();
+		if (this->GetType() == false) {
+			m_emFileType = en_txt;
+		}
 	}
 	switch (m_emFileType) {
-	case en_txt:
+	case en_txt: {
 		m_pFile = new C_TxtFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_off:
+	}
+	case en_off: {
 		m_pFile = new C_OffFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_rar:
+	}
+	case en_rar: {
 		m_pFile = new C_RarFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_zip:
+	}
+	case en_zip: {
 		m_pFile = new C_ZipFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_gz:
+	}
+	case en_gz: {
 		m_pFile = new C_GzFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_pdf:
+	}
+	case en_pdf: {
 		m_pFile = new C_PdfFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_tar:
+	}
+	case en_tar: {
 		m_pFile = new C_TarFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_7zip:
+	}
+	case en_7zip: {
 		m_pFile = new C_7zipFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_xml:
+	}
+	case en_xml: {
 		m_pFile = new C_XmlFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_rtf:
+	}
+	case en_rtf: {
 		m_pFile = new C_RtfFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
-	case en_html:
+	}
+	case en_html: {
 		m_pFile = new C_HtmlFile(m_pszFilePath, m_pszFileData, m_ulFileLen);
 		break;
+	}
 	default:
 		m_pFile = NULL;
 	}
@@ -365,6 +393,11 @@ bool C_FileAnalyze::Analyze() {
 		cout << "文件类型识别失败" << endl;
 		return false;
 	}
+
+	m_pFile->SetResult(m_pResult);
+	m_pFile->SetRule(m_pRule);
+
+	return m_pFile->AnalyzeFile();
 
 }
 

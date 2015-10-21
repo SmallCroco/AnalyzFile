@@ -8,7 +8,7 @@
 #ifndef CONTENT_FILESTRUCT_H_
 #define CONTENT_FILESTRUCT_H_
 
-typedef enum EM_FileType {
+enum EM_FileType {
 	en_txt,
 	en_off,
 	en_rar,
@@ -23,8 +23,8 @@ typedef enum EM_FileType {
 	en_unknow
 };
 
-typedef enum EM_FileEncode {
-	en_unknow = 0,
+enum EM_FileEncode {
+	en_unknowEncode = 0,
 	en_ascii = 1,
 	en_iso_8599 = 2,
 	en_utf_7 = 4,

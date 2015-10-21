@@ -12,13 +12,13 @@
 
 class C_PatternUnit_Others: public C_PatternUnit {
 public:
+	C_PatternUnit_Others(const C_PatternUnit_Others& unit);
 	C_PatternUnit_Others();
 	~C_PatternUnit_Others();
 
 	const void* getPcre();
 	const void* getPcreExtra();
 
-protected:
 	int PcreCompile();
 
 private:
