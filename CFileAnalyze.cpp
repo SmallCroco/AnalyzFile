@@ -5,6 +5,8 @@
  *      Author: SmallCroco
  */
 
+#define DEBUG
+
 #include "CFileAnalyze.h"
 #include "FileStruct.h"
 #include "CGzFile.h"
@@ -18,12 +20,24 @@
 #include "CRtfFile.h"
 #include "CPdfFile.h"
 #include "COffFile.h"
+#include "unzip.h"
 #include <iostream>
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
 
 using namespace std;
+
+char szOfficePath[8][40] = {
+		"_rels/.rels",				// 1
+		"docProps/app.xml",		// 2
+		"docProps/core.xml",		// 3
+		"docProps/custom.xml",	// 4
+		"word/document.xml",		// 5
+		"ppt/presentation.xml",	//	6
+		"xl/workbook.xml",			// 7
+		"[Content_Types].xml"		// 8
+};
 
 /*
  * @Function Name 	: C_FileAnalyze
@@ -187,6 +201,17 @@ const EM_FileType C_FileAnalyze::GetFileType() {
 	return this->m_emFileType;
 }
 
+int C_FileAnalyze::isInclude(const char* pszFilePath) {
+
+	for (int i = 0; i < 8; i++) {
+		if (strcmp(pszFilePath, szOfficePath[i]) == 0) {
+			return i + 1;
+		}
+	}
+
+	return 0;
+}
+
 /*
  * @Function Name	: GetFileType
  * @Description		: 根据文件内容分析文件类型
@@ -245,13 +270,74 @@ bool C_FileAnalyze::GetType() {
 	// Zip文件
 	if (m_pszFileData[0] == 0x50 && m_pszFileData[1] == 0x4B
 			&& m_pszFileData[2] == 0x03 && m_pszFileData[3] == 04) {
-		m_emFileType = en_zip;
-		return true;
+
+		// 进一步判断是不是扩展的office文件
+		unzFile uf = unzOpen64(m_pszFilePath);
+		if (uf == NULL) {
+#ifdef DEBUG
+			cout<<"cannot open "<<m_pszFilePath<<endl;
+#endif
+			m_emFileType = en_zip;
+			return true;
+		}
+
+		// 解压操作结果
+		int err = UNZ_OK;
+
+		unz_global_info64 gi;		// zip包中的所有文件信息
+		err = unzGetGlobalInfo64(uf, &gi);
+		if (err != UNZ_OK) {
+#ifdef DEBUG
+			cout<<"error "<<err<<" with zipfile in unzGetGlobalInfo"<<endl;
+#endif
+			m_emFileType = en_zip;
+			return true;
+		}
+
+		// 判断是world, ppt还是excel
+		int nType = 0;
+
+		for (unsigned int i = 0; i < gi.number_entry; i++) {
+			unz_file_info64 file_info;	// 文件信息
+			char filename_inzip[256];		// zip包中的文件名
+
+			err = unzGetCurrentFileInfo64(uf, &file_info, filename_inzip, sizeof(filename_inzip), NULL, 0, NULL, 0);
+			if (err != UNZ_OK) {
+#ifdef DEBUG
+				cout<<"error "<<err<<" with zipfilein unzGetCurrentFileInfo64"<<endl;
+#endif
+				break;
+			}
+
+			nType += isInclude(filename_inzip);
+
+			// 指向下一个文件
+			if ((i+1) < gi.number_entry) {
+				err = unzGoToNextFile(uf);
+				if (err != UNZ_OK) {
+#ifdef DEBUG
+					cout<<"error "<<err<<" with zipfile in unzGoToNextFile"<<endl;
+#endif
+					break;
+				}
+			}
+		}
+
+		if (nType == 19 || nType == 21 || nType == 24) {
+			m_emFileType = en_off;
+			return true;
+		} else {
+			m_emFileType = en_zip;
+			return true;
+		}
 	}
 
 	// tar文件
 	if (m_ulFileLen > 512) {
-		tar_header* tarHeader = (tar_header*) m_pszFileData;
+		tar_header* tarHeader = new tar_header();
+		memset(tarHeader, 0, sizeof(tar_header));
+		memcpy(tarHeader, m_pszFileData, sizeof(tar_header));
+
 		if ((tarHeader->magic[0] != 'u') || (tarHeader->magic[1] != 's')
 				|| (tarHeader->magic[2] != 't') || (tarHeader->magic[3] != 'a')
 				|| (tarHeader->magic[4] != 'r')

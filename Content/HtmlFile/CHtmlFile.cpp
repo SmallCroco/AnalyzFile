@@ -50,6 +50,8 @@ bool C_HtmlFile::ExtractTxt() {
 		return false;
 	}
 
+	m_ulTextLen = m_strText.length();
+
 	return true;
 }
 
@@ -161,12 +163,16 @@ bool C_HtmlFile::GetFileEncode() {
 bool C_HtmlFile::AnalyzeFile() {
 
 	// 获取文本
-	if (ExtractTxt()) {
+	if (!ExtractTxt()) {
 
-		// 获取文本编码方式
-		if (GetFileEncode()) {
+		// 提取文本失败后，直接把文件内容当文本内容
+		m_strText.append(m_pszFileData, m_ulFileLen);
+		m_ulTextLen = m_strText.length();
+	}
 
-			switch(m_emEncode) {
+	// 获取文本编码方式
+	if (GetFileEncode()) {
+		switch(m_emEncode) {
 			case en_ascii: m_pRule->asciiMatch(m_strText.c_str(), m_ulTextLen, m_pResult); break;
 			case en_iso_8599: m_pRule->iso8599Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
 			case en_utf_7: m_pRule->utf7Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
@@ -184,9 +190,8 @@ bool C_HtmlFile::AnalyzeFile() {
 			case en_unknowEncode: return false;
 			}
 
-			return true;
-		}
+		return true;
+	} else {
+		return false;
 	}
-
-	return false;
 }

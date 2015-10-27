@@ -562,16 +562,121 @@ void C_RegularRule::asciiMatch(const char* pszFileText, int bufLen, C_RegularRes
 }
 
 
-void C_RegularRule::iso8599Match(const char* pszFileText, int bufLen,  C_RegularResult* result) {
+void C_RegularRule::iso8599Match(const char* pszFileText, int bufLen,  C_RegularResult* res) {
 
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_GB18030*>::iterator li =
+			m_gb18030Patterns.begin(); li != m_gb18030Patterns.end();
+			++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre *) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY, ovector, 12);
+
+			if (rc < 0) {
+				break;
+			}
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+
+		}
+	}
 }
 
 void C_RegularRule::utf7Match(const char* pszFileText, int bufLen, C_RegularResult* result) {
 
 }
 
-void C_RegularRule::utf8Match(const char* pszFileText, int bufLen, C_RegularResult* result) {
+void C_RegularRule::utf8Match(const char* pszFileText, int bufLen, C_RegularResult* res) {
 
+
+	int rc = 0;
+	int ovector[12];
+
+	for (vector<C_PatternUnit_UTF8*>::iterator li = m_utf8Patterns.begin();
+			li != m_utf8Patterns.end(); ++li) {
+
+		for (int offset = 0; offset < bufLen;) {
+			rc = pcre_exec((pcre*) (*li)->getPcre(),
+					(const pcre_extra *) (*li)->getPcreExtra(),
+					(PCRE_SPTR) pszFileText, bufLen, offset,
+					PCRE_NOTEMPTY | PCRE_NO_UTF8_CHECK, ovector, 12);
+			if (rc < 0) {
+				break;
+			}
+
+
+			SMatchUnit amatch;
+			amatch.ID = (*li)->m_nPid;
+			amatch.matchPosition = pszFileText + ovector[0];
+			amatch.matchLen = ovector[1] - ovector[0];
+			int flag = 0;
+
+			// 遍历种类编号,查找是否已经存在种类编号
+			for (unsigned int i = 0; i < res->results.size(); i++) {
+				if (amatch.ID == res->results[i].ID) {
+					res->m_totalNum += 1;
+					res->results[i].num += 1;
+					res->results[i].unit.push_back(amatch);
+
+					flag = 1;
+
+					break;
+				}
+			}
+
+			// 如果不存在
+			if (flag == 0) {
+				res->m_unitNum += 1;
+				res->m_totalNum += 1;
+
+				SMatchUnitNum unitNum;
+				unitNum.ID = amatch.ID;
+				unitNum.num = 1;
+				unitNum.unit.push_back(amatch);
+
+				res->results.push_back(unitNum);
+			}
+
+			offset = ovector[1];
+		}
+	}
 }
 
 void C_RegularRule::utf16Match(const char* pszFileText, int bufLen, C_RegularResult* res) {

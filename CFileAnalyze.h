@@ -18,7 +18,7 @@ public:
 	C_FileAnalyze(const char* pszFilePath, EM_FileType emFileType = en_unknow);
 
 	// 通过文件内容初始化
-	C_FileAnalyze(const char* pszFileContent, unsigned long ulFileLen, EM_FileType emFileType = en_unknow);
+	C_FileAnalyze(const char* pszFileContent, unsigned long ulFileLen, EM_FileType emFileType = en_txt);
 
 	// 析构函数
 	~C_FileAnalyze();
@@ -41,6 +41,9 @@ public:
 private:
 	// 判断文件类型
 	bool GetType();
+
+	// 判断一个路径是否在其中
+	int isInclude(const char* pszFilePath);
 
 private:
 	const char* 		m_pszFilePath;	//	文件路径

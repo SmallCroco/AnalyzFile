@@ -43,7 +43,7 @@ bool C_TxtFile::ExtractTxt() {
 
 	m_strText.append(m_pszFileData, m_ulFileLen);
 
-	m_ulTextLen = m_ulFileLen;
+	m_ulTextLen = m_strText.length();
 
 	return true;
 }
@@ -51,12 +51,16 @@ bool C_TxtFile::ExtractTxt() {
 bool C_TxtFile::AnalyzeFile() {
 
 	// 获取文本
-	if (ExtractTxt()) {
+	if (!ExtractTxt()) {
 
-		// 获取文本编码方式
-		if (GetFileEncode()) {
+		// 提取文本失败后，直接把文件内容当文本内容
+		m_strText.append(m_pszFileData, m_ulFileLen);
+		m_ulTextLen = m_strText.length();
+	}
 
-			switch(m_emEncode) {
+	// 获取文本编码方式
+	if (GetFileEncode()) {
+		switch(m_emEncode) {
 			case en_ascii: m_pRule->asciiMatch(m_strText.c_str(), m_ulTextLen, m_pResult); break;
 			case en_iso_8599: m_pRule->iso8599Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
 			case en_utf_7: m_pRule->utf7Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
@@ -71,17 +75,13 @@ bool C_TxtFile::AnalyzeFile() {
 			case en_gb2312: m_pRule->gb18030Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
 			case en_gb18030: m_pRule->gb18030Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
 			case en_big5: m_pRule->big5Match(m_strText.c_str(), m_ulTextLen, m_pResult); break;
-			case en_unknowEncode: {
-				std::cout<<m_pszFilePath<<"编码获取失败"<<std::endl;
-				return false;
-			}
+			case en_unknowEncode: return false;
 			}
 
-			return true;
-		}
+		return true;
+	} else {
+		return false;
 	}
-
-	return false;
 }
 
 /*

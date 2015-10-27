@@ -15,7 +15,10 @@ CFileAnalyze.d: ../CFileAnalyze.cpp ../CFileAnalyze.h \
  /home/smallcroco/workspace/AnalyzFile/Content/RarFile/CRarFile.h \
  /home/smallcroco/workspace/AnalyzFile/Content/RtfFile/CRtfFile.h \
  /home/smallcroco/workspace/AnalyzFile/Content/PdfFile/CPdfFile.h \
- /home/smallcroco/workspace/AnalyzFile/Content/OffFile/COffFile.h
+ /home/smallcroco/workspace/AnalyzFile/Content/OffFile/COffFile.h \
+ /home/smallcroco/workspace/AnalyzFile/Content/ZipFile/unzip.h \
+ /home/smallcroco/workspace/AnalyzFile/Content/ZipFile/zlib.h \
+ /home/smallcroco/workspace/AnalyzFile/Content/ZipFile/ioapi.h
 
 ../CFileAnalyze.h:
 
@@ -52,3 +55,9 @@ CFileAnalyze.d: ../CFileAnalyze.cpp ../CFileAnalyze.h \
 /home/smallcroco/workspace/AnalyzFile/Content/PdfFile/CPdfFile.h:
 
 /home/smallcroco/workspace/AnalyzFile/Content/OffFile/COffFile.h:
+
+/home/smallcroco/workspace/AnalyzFile/Content/ZipFile/unzip.h:
+
+/home/smallcroco/workspace/AnalyzFile/Content/ZipFile/zlib.h:
+
+/home/smallcroco/workspace/AnalyzFile/Content/ZipFile/ioapi.h:

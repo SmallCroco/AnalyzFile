@@ -21,13 +21,14 @@ C_PatternUnit_UTF8::C_PatternUnit_UTF8() {
 C_PatternUnit_UTF8::C_PatternUnit_UTF8(const C_PatternUnit_UTF8 &unit) {
 	this->m_nContentLen = unit.m_nContentLen;
 	this->m_nPid = unit.m_nPid;
-	this->m_pContent = new char[m_nContentLen];
-	memset(m_pContent, 0, m_nContentLen);
-	memcpy(m_pContent, unit.m_pContent, m_nContentLen);
+	this->m_pContent = new char[m_nContentLen+1];
+	memset(m_pContent, 0, sizeof(char)*(m_nContentLen+1));
+	memcpy(m_pContent, unit.m_pContent, m_nContentLen*sizeof(char));
 
-	this->m_pName = new char[strlen(unit.m_pName)];
-	memset(m_pName, 0, strlen(unit.m_pName));
-	memcpy(m_pName, unit.m_pName, strlen(unit.m_pName));
+	int n = strlen(unit.m_pName);
+	this->m_pName = new char[n+1];
+	memset(m_pName, 0, sizeof(char)*(n+1));
+	memcpy(m_pName, unit.m_pName, n*sizeof(char));
 
 	const char* error;
 	int erroffset;
@@ -38,12 +39,18 @@ C_PatternUnit_UTF8::C_PatternUnit_UTF8(const C_PatternUnit_UTF8 &unit) {
 						| PCRE_MULTILINE | PCRE_NO_START_OPTIMIZE, &error,
 				&erroffset,
 				NULL);
+		if (NULL == m_pPcre) {
+			std::cout<<"PCRE UTF8 compilation failed at offset"<<erroffset<<":"<<error<<std::endl;
+		}
 	} else {
 		this->m_pPcre = NULL;
 	}
 
 	if (unit.m_pPcreExtra != NULL) {
 		this->m_pPcreExtra = pcre_study(m_pPcre, PCRE_STUDY_JIT_COMPILE, &error);
+		if (NULL == m_pPcreExtra) {
+				cout<<"PCRE UTF8 pcre_study failed:"<<error<<std::endl;
+			}
 	} else {
 		this->m_pPcreExtra = NULL;
 	}

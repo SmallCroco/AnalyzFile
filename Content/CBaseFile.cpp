@@ -23,9 +23,9 @@ C_BaseFile::C_BaseFile(const char* pszFilePath, const unsigned char* pszFileData
 		unsigned long ulFileLen, EM_FileEncode emEncode):m_pszFilePath(pszFilePath) {
 
 	if (NULL != pszFileData) {
-		m_pszFileData = new char[ulFileLen];
+		m_pszFileData = new char[ulFileLen+1];
 		if (NULL != m_pszFileData) {
-			memset(m_pszFileData, 0, ulFileLen*sizeof(char));
+			memset(m_pszFileData, 0, (ulFileLen + 1)*sizeof(char));
 			memcpy(m_pszFileData, pszFileData, ulFileLen*sizeof(char));
 			m_ulFileLen = ulFileLen;
 		} else {
